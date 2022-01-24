@@ -15,7 +15,7 @@ public class Tiles {
         tiles.put('D',2);
         tiles.put('E',1);
         tiles.put('F',4);
-        tiles.put('G',1);
+        tiles.put('G',2);
         tiles.put('H',4);
         tiles.put('I',1);
         tiles.put('J',8);

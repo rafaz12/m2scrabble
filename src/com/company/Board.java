@@ -49,14 +49,14 @@ public class Board {
     int getTileNumbers(){
         return tiles.getTiles().size();
     }
-    void setXCoordinate(int x, int y) {
+    void setYCoordinate(int x, int y) {
         for (k = 0; k < word.length(); k++) {
             board[x][y + k].equals(word.charAt(k));
             board[x][y + k] = String.valueOf(word.charAt(k));
         }
 
     }
-    void setYCoordinate(int x, int y){
+    void setXCoordinate(int x, int y){
         for ( k = 0; k < word.length(); k++) {
             board[x + k][y].equals(word.charAt(k));
             board[x + k][y] = String.valueOf(word.charAt(k));
@@ -85,10 +85,12 @@ public class Board {
         } else
             setYCoordinate(7,7);
         wordsWritten.add(word);
-        setScore(7, 7, word);
-        int score = getScore();
+        setScore(7, 7,coord, word);
+        score = getScore();
+
         setNewBoard();
         getNewBoard();
+        System.out.println("Your score is: "+score);
 
 
     }
@@ -99,8 +101,13 @@ public class Board {
         int x = 0,y = 0;
         int i;
         do {
+            System.out.println("Please select coordinate x or y for word expansion ");
+            Scanner sc = new Scanner(System.in);
+            coord = sc.next();
+        }while (!coord.equals("x") && !coord.equals("y"));
+
+        do {
             System.out.println("Please select coordinates x,y");
-            sc = new Scanner(System.in);
             k = sc.next();
             l = sc.next();
             if(ill.isInteger(k) && ill.isInteger(l)) {
@@ -109,15 +116,9 @@ public class Board {
             }
             else
                 System.out.println("Not valid coordinates.");
-        } while (isField(x, y) || !ill.isInteger(k) || !ill.isInteger(l));
+        } while (!ill.validCoordinate(x, y  ) ||isField(x, y) || !ill.isInteger(k) || !ill.isInteger(l));
 
-        System.out.println("Please select coordinate x or y for word expansion ");
-        Scanner sc = new Scanner(System.in);
-        coord = sc.next();
-        while (!coord.equals("x") && !coord.equals("y")){
-            System.out.println("Wrong format , please enter characters x or y. ");
-            coord = sc.next();
-        }
+
 
 
             System.out.println("Please enter a word. ");
@@ -125,22 +126,24 @@ public class Board {
 
             for (i = 0; i < word.length(); i++) {
                 if (coord.equals("x")) {
-                    if (isField(x, y + i) || !ill.validCoordinate(x, y + i))
+                    if (!ill.validCoordinate(x, y + i) || isField(x, y + i) )
+                        y = y + i;
                         break;
-                } else if (isField(x + i, y) || !ill.validCoordinate(x + i, y))
+                } else if ( !ill.validCoordinate(x + i, y) || isField(x + i, y))
+                    x = x + i;
                     break;
 
         } while (!ill.noMoreTiles(word,tiles.getTiles()) || ill.wordExists(word , wordsWritten )
-                || isField(x, y + i) || isField(x + i, y) &&
-                !ill.validCoordinate(x, y + i) && !ill.validCoordinate(x + i, y)) {
+                ||  !ill.validCoordinate( x, y) || !ill.validCoordinate(x , y)
+                || isField(x, y )) {
             System.out.println("Word not valid please enter another word with the remaining tiles and inside the bounds. ");
             word = sc.next().toUpperCase();
 
             for (i = 0; i < word.length(); i++) {
                 if (coord.equals("x")) {
-                    if (isField(x, y + i) || !ill.validCoordinate(x, y + i))
+                    if ( !ill.validCoordinate(x, y + i) || isField(x, y + i) )
                         break;
-                } else if (isField(x + i, y) || !ill.validCoordinate(x + i, y))
+                } else if ( !ill.validCoordinate(x + i, y) || isField(x + i, y) )
                     break;
 
             }
@@ -151,7 +154,7 @@ public class Board {
         } else
             setYCoordinate(x,y);
 
-        setScore(x, y, word);
+        setScore(x, y,coord, word);
         int score = getScore();
         setNewBoard();
         getNewBoard();
@@ -160,14 +163,50 @@ public class Board {
         System.out.println(score);
     }
 
-    void setScore(int x, int y, String word) {
+    void setScore(int x, int y, String coord ,  String word) {
         setFieldsScore();
         int[][] arr = getFieldPoints();
+        int dredCount = 0;
+        int predCount = 0;
+        if (coord.equals("x")) {
+            for (k = 0; k < word.length(); k++) {
+                if (arr[x][y + k] == dred) {
+                    score = score + tiles.getTilesValues().get(word.charAt(k));
+                    dredCount++;
+                } else if (arr[x][y + k] == pred || arr[x][y + k] == start) {
+                    score = score + tiles.getTilesValues().get(word.charAt(k));
+                    predCount++;
+                } else
+                    score = score + arr[x][y + k] * tiles.getTilesValues().get(word.charAt(k));
+            }
+            if (dredCount > 0 && predCount > 0)
+                score = score * predCount * pred * dredCount * dred;
+            else if (dredCount > 0 && predCount == 0)
+                score = score * dredCount * dred;
 
-        for (k = 0; k < word.length(); k++)
-            score = score + arr[x][y + k] * getFieldPoints()[x][y + k];
+            else if (dredCount == 0 && predCount > 0)
+                score = score * predCount * pred;
+        } else {
+            for (k = 0; k < word.length(); k++) {
+                if (arr[x + k][y ] == dred) {
+                    score = score + tiles.getTilesValues().get(word.charAt(k));
+                    dredCount++;
+                } else if (arr[x + k][y ] == pred || arr[x + k][y] == start) {
+                    score = score + tiles.getTilesValues().get(word.charAt(k));
+                    predCount++;
+                } else
+                    score = score + arr[x + k][y] * tiles.getTilesValues().get(word.charAt(k));
+            }
+            if (dredCount > 0 && predCount > 0)
+                score = score * predCount * pred * dredCount * dred;
+            else if (dredCount > 0 && predCount == 0)
+                score = score * dredCount * dred;
 
+            else if (dredCount == 0 && predCount > 0)
+                score = score * predCount * pred;
+        }
     }
+
 
     int getScore() {
         return score;

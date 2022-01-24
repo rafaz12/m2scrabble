@@ -19,14 +19,14 @@ public class IllegalArguments {
         }
     }
     boolean validCoordinate(int x, int y){
-        if(x > 14 || x < 0 || y > 14 || y < 0)
-            return false;
-        return true;
+        if(x < 15 && x >= 0 && y < 15 && y >= 0)
+            return true;
+        return false;
     }
     boolean wordExists(String word , ArrayList<String> words){
         if(words.contains(word))
-            return false;
-        return true;
+            return true;
+        return false;
     }
     boolean noMoreTiles(String word , ArrayList<Map.Entry<Character, Integer>> tiles) {
         ArrayList<Character> removedLetters = new ArrayList<>();
