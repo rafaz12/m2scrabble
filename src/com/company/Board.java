@@ -1,8 +1,7 @@
 package com.company;
 
 
-import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.*;
 
 import static java.lang.Integer.parseInt;
 
@@ -99,25 +98,45 @@ public class Board {
     }
     void skipTurn(){
         String letters ="";
-        System.out.println("Select letters to replace or just press 'enter' to skip.");
+        String skip = "skip!".toUpperCase();
+        System.out.println("Select letters to replace or enter 'skip!' to skip.");
         boolean letterExist;
+        ArrayList<Map.Entry<Character, Integer>> lettersArray = new ArrayList<>();
         do {
-            letters = sc.next();
+            letters = sc.next().toUpperCase();
+            if(letters.equals(skip))
+                break;
             letterExist = false;
 
+
             for (int i = 0; i < letters.length(); i++) {
-                if (!tiles.getPlayerBag().contains(letters.charAt(i))) {
+                char key = letters.charAt(i);
+                lettersArray.add(Map.entry(key,tiles.getTilesValues().get(key)));
+            }
+            for (int i = 0; i < letters.length(); i++) {
+                if (!tiles.getPlayerBag().contains(lettersArray.get(i))) {
                     System.out.println("You don't have this letters in your bag please select another one.");
                     break;
                 }
                 else letterExist = true;
             }
             if(letterExist){
-                for(int i = 0; i < letters.length(); i++ ){
+                for(int i = 0; i < letters.length(); i++ )
+                    for(int j=0; j<tiles.getPlayerBag().size(); j++ )
+                        if(tiles.getPlayerBag().get(j).getKey().equals(letters.charAt(i))){
+                            tiles.getPlayerBag().remove(j);
+                            tiles.getTiles().add(tiles.getPlayerBag().get(j));
+                            Collections.shuffle(tiles.getTiles());
 
-                }
+                        }
+                tiles.setNewPlayerBag(letters.length());
+                System.out.println("Your tiles now are "+ tiles.getPlayerBag());
+
+
+
+
             }
-        }while(!letterExist)
+        }while(!letterExist);
     }
     void enterWord() {
 
@@ -331,6 +350,7 @@ public class Board {
         b.setFieldsScore();
         b.enterFirstWord();
         b.enterWord();
+        b.skipTurn();
 
     }
 }

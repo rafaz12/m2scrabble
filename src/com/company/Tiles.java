@@ -85,7 +85,7 @@ public class Tiles {
     void setNewPlayerBag(int i ){
         for ( int j = 0; j < i; j++){
             playerBag.add(generalTiles.get(j));
-            generalTiles.remove(generalTiles.get(j));
+            generalTiles.remove(j);
         }
 
     }
