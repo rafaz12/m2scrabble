@@ -64,10 +64,12 @@ public class Board {
         }
     }
     void enterFirstWord() {
-        int i ;
+        int i;
         tiles = new Tiles();
         tiles.setTiles();
-        System.out.println("Your remaining letters are " + tiles.getTiles());
+        tiles.setPlayerBag();
+        System.out.println("Your remaining letters are " + tiles.getPlayerBag());
+        System.out.println("General bag "+tiles.getTiles());
         do {
             Scanner sc = new Scanner(System.in);
             System.out.println("Please select coordinate x or y for word expansion ");
@@ -79,7 +81,7 @@ public class Board {
             word = sc.next().toUpperCase();
 
 
-        }while(!ill.validCoordinate(7 + word.length()-1, 7) && !ill.validCoordinate(7 , 7 + word.length()-1) || !ill.noMoreTiles(word, tiles.getTiles()));
+        }while(!ill.validCoordinate(7 + word.length()-1, 7) && !ill.validCoordinate(7 , 7 + word.length()-1) || !ill.noMoreTiles(word, tiles.getPlayerBag()));
         if (coord.equals("x")) {
             setXCoordinate( 7, 7);
         } else
@@ -87,16 +89,39 @@ public class Board {
         wordsWritten.add(word);
         setScore(7, 7,coord, word);
         score = getScore();
-
+        tiles.setNewPlayerBag(word.length());
+        tiles.getPlayerBag();
         setNewBoard();
         getNewBoard();
         System.out.println("Your score is: "+score);
 
 
     }
+    void skipTurn(){
+        String letters ="";
+        System.out.println("Select letters to replace or just press 'enter' to skip.");
+        boolean letterExist;
+        do {
+            letters = sc.next();
+            letterExist = false;
+
+            for (int i = 0; i < letters.length(); i++) {
+                if (!tiles.getPlayerBag().contains(letters.charAt(i))) {
+                    System.out.println("You don't have this letters in your bag please select another one.");
+                    break;
+                }
+                else letterExist = true;
+            }
+            if(letterExist){
+                for(int i = 0; i < letters.length(); i++ ){
+
+                }
+            }
+        }while(!letterExist)
+    }
     void enterWord() {
 
-        System.out.println("Your remaining letters are " + tiles.getTiles());
+        System.out.println("Your remaining letters are " + tiles.getPlayerBag());
         String k, l;
         int x = 0,y = 0;
         int i;
@@ -133,7 +158,7 @@ public class Board {
                     x = x + i;
                     break;
 
-        } while (!ill.noMoreTiles(word,tiles.getTiles()) || ill.wordExists(word , wordsWritten )
+        } while (!ill.noMoreTiles(word,tiles.getPlayerBag()) || ill.wordExists(word , wordsWritten )
                 ||  !ill.validCoordinate( x, y) || !ill.validCoordinate(x , y)
                 || isField(x, y )) {
             System.out.println("Word not valid please enter another word with the remaining tiles and inside the bounds. ");
@@ -156,9 +181,13 @@ public class Board {
 
         setScore(x, y,coord, word);
         int score = getScore();
+        tiles.setNewPlayerBag(word.length());
+        tiles.getPlayerBag();
         setNewBoard();
         getNewBoard();
-        System.out.println("Your remaining letters are " + tiles.getTiles());
+        System.out.println("Your remaining letters are " + tiles.getPlayerBag());
+        System.out.println("General bag "+tiles.getTiles());
+        System.out.println(tiles.getPlayerBag().size());
         System.out.println(tiles.getTiles().size());
         System.out.println(score);
     }
@@ -209,7 +238,7 @@ public class Board {
 
 
     int getScore() {
-        return score;
+        return this.score;
     }
 
     boolean isField(int i, int j) {

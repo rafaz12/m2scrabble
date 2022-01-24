@@ -6,7 +6,8 @@ import java.util.*;
 public class Tiles {
     private HashMap<Character,Integer> tiles ;
     private int[] quantity ;
-    private ArrayList<Map.Entry<Character, Integer>> playerTiles;
+    private ArrayList<Map.Entry<Character, Integer>> generalTiles;
+    private ArrayList<Map.Entry<Character, Integer>> playerBag;
     public Tiles(){
         tiles = new HashMap<Character,Integer>();
         tiles.put('A',1);
@@ -73,9 +74,30 @@ public class Tiles {
         return tiles;
     }
 
+    void setPlayerBag(){
+        playerBag = new ArrayList<>();
+        for ( int i=0; i < 7; i++ ) {
+            playerBag.add(generalTiles.get(i));
+            generalTiles.remove(generalTiles.get(i));
+        }
+
+    }
+    void setNewPlayerBag(int i ){
+        for ( int j = 0; j < i; j++){
+            playerBag.add(generalTiles.get(j));
+            generalTiles.remove(generalTiles.get(j));
+        }
+
+    }
+    ArrayList<Map.Entry<Character, Integer>> getPlayerBag() {
+        return this.playerBag;
+    }
+
+
+
     void setTiles(){
         ArrayList<Map.Entry<Character, Integer>> setTiles = new ArrayList<>();
-        playerTiles = new ArrayList<>();
+        generalTiles = new ArrayList<>();
 
         Set<Map.Entry<Character,Integer>> set = tiles.entrySet();
         for (Map.Entry<Character, Integer> t : set)
@@ -83,14 +105,15 @@ public class Tiles {
 
         for(int j=0 ; j < 27; j++){
             for (int i=0 ; i < quantity[j]; i++){
-                playerTiles.add(setTiles.get(j));
+                generalTiles.add(setTiles.get(j));
             }
         }
-        System.out.println(playerTiles.size());
+        Collections.shuffle(generalTiles);
+        System.out.println(generalTiles.size());
 
     }
     ArrayList<Map.Entry<Character, Integer>> getTiles(){
-        return playerTiles;
+        return generalTiles;
     }
 
     public static void main(String[] args) {
