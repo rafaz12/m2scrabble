@@ -1,6 +1,7 @@
 package com.company;
 
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 import static java.lang.Integer.parseInt;
@@ -18,6 +19,7 @@ public class Board {
     private int[][] fieldPoints;
     private Coordinates coordinates = new Coordinates();
     private Tiles tiles;
+    private int c = 0;
     private ArrayList<String> wordsWritten = new ArrayList<>();
     private int score = 0, m = 0, k = 0;
     private String[][] board = new String[DIM][DIM];
@@ -45,171 +47,203 @@ public class Board {
 
     }
 
-    int getTileNumbers(){
+    int getTileNumbers() {
         return tiles.getTiles().size();
     }
-    void setYCoordinate(int x, int y) {
+
+    void setYCoordinate(int x, int y, String word) {
         for (k = 0; k < word.length(); k++) {
-            board[x][y + k].equals(word.charAt(k));
-            board[x][y + k] = String.valueOf(word.charAt(k));
+            this.board[x][y + k].equals(word.charAt(k));
+            this.board[x][y + k] = String.valueOf(word.charAt(k));
         }
 
     }
-    void setXCoordinate(int x, int y){
-        for ( k = 0; k < word.length(); k++) {
-            board[x + k][y].equals(word.charAt(k));
-            board[x + k][y] = String.valueOf(word.charAt(k));
 
+    void setXCoordinate(int x, int y , String word) {
+        for (k = 0; k < word.length(); k++) {
+            this.board[x + k][y].equals(word.charAt(k));
+            this.board[x + k][y] = String.valueOf(word.charAt(k));
         }
     }
+
+    void remainingLetters(ArrayList<Map.Entry<Character, Integer>> bag) {
+        System.out.println(bag);
+    }
+
+    String getWordDirection() {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Please select coordinate x or y for word expansion ");
+        coord = sc.next();
+        while (!coord.equals("x") && !coord.equals("y")) {
+
+            System.out.println("Please select coordinate x or y for word expansion ");
+            coord = sc.next();
+        }
+        return coord;
+    }
+
+    String getWord() {
+        String word;
+        System.out.println("Please enter a word. ");
+        sc = new Scanner(System.in);
+        word = sc.next().toUpperCase();
+
+        return word;
+    }
+
+    void removeBagTiles(ArrayList<Map.Entry<Character, Integer>> playerBag , String word) {
+
+        for (int x = 0; x < word.length(); x++)
+            for (int m = 0; m < playerBag.size(); m++) {
+                if (playerBag.get(m).getKey().equals(word.charAt(x)) || String.valueOf(playerBag.get(m).getKey()).equals(" ")) {
+                    tiles.getTiles().add(playerBag.get(m));
+                    playerBag.remove(playerBag.get(m));
+
+                }
+            }
+    }
+
     void enterFirstWord() {
-        int i;
         tiles = new Tiles();
         tiles.setTiles();
         tiles.setPlayerBag();
-        System.out.println("Your remaining letters are " + tiles.getPlayerBag());
-        System.out.println("General bag "+tiles.getTiles());
+        remainingLetters(tiles.getPlayerBag());
+        remainingLetters(tiles.getTiles());
+        String coord = getWordDirection();
+        String word;
         do {
-            Scanner sc = new Scanner(System.in);
-            System.out.println("Please select coordinate x or y for word expansion ");
-            coord = sc.next();
-        } while (!coord.equals("x") && !coord.equals("y"));
-        do {
-            System.out.println("Please enter a word. ");
-            sc = new Scanner(System.in);
-            word = sc.next().toUpperCase();
+            word = getWord();
+        } while (!ill.validCoordinate(7 + word.length() - 1, 7) || !ill.validCoordinate(7, 7 + word.length() - 1) || !ill.noMoreTiles(word, tiles.getPlayerBag()));
 
-
-        }while(!ill.validCoordinate(7 + word.length()-1, 7) && !ill.validCoordinate(7 , 7 + word.length()-1) || !ill.noMoreTiles(word, tiles.getPlayerBag()));
         if (coord.equals("x")) {
-            setXCoordinate( 7, 7);
+            setYCoordinate(7, 7 , word);
         } else
-            setYCoordinate(7,7);
+            setXCoordinate(7, 7 , word);
+
+        removeBagTiles(tiles.getPlayerBag() , word);
         wordsWritten.add(word);
-        setScore(7, 7,coord, word);
+        setScore(7, 7, coord, word);
         score = getScore();
         tiles.setNewPlayerBag(word.length());
-        tiles.getPlayerBag();
         setNewBoard();
         getNewBoard();
-        System.out.println("Your score is: "+score);
-
+        System.out.println("Your score is: " + score);
+        remainingLetters(tiles.getPlayerBag());
+        remainingLetters(tiles.getTiles());
 
     }
-    void skipTurn(){
-        String letters ="";
-        String skip = "skip!".toUpperCase();
-        System.out.println("Select letters to replace or enter 'skip!' to skip.");
-        boolean letterExist;
-        ArrayList<Map.Entry<Character, Integer>> lettersArray = new ArrayList<>();
-        do {
-            letters = sc.next().toUpperCase();
-            if(letters.equals(skip))
-                break;
-            letterExist = false;
 
-
-            for (int i = 0; i < letters.length(); i++) {
-                char key = letters.charAt(i);
-                lettersArray.add(Map.entry(key,tiles.getTilesValues().get(key)));
-            }
-            for (int i = 0; i < letters.length(); i++) {
-                if (!tiles.getPlayerBag().contains(lettersArray.get(i))) {
-                    System.out.println("You don't have this letters in your bag please select another one.");
-                    break;
+    void swapLetters(String letters) {
+        for (int i = 0; i < letters.length(); i++)
+            for (int j = 0; j < tiles.getPlayerBag().size(); j++)
+                if (tiles.getPlayerBag().get(j).getKey().equals(letters.charAt(i))) {
+                    tiles.getTiles().add(tiles.getPlayerBag().get(j));
+                    tiles.getPlayerBag().remove(tiles.getPlayerBag().get(j));
+                    Collections.shuffle(tiles.getTiles());
+                    tiles.setNewPlayerBag(letters.length());
                 }
-                else letterExist = true;
-            }
-            if(letterExist){
-                for(int i = 0; i < letters.length(); i++ )
-                    for(int j=0; j<tiles.getPlayerBag().size(); j++ )
-                        if(tiles.getPlayerBag().get(j).getKey().equals(letters.charAt(i))){
-                            tiles.getPlayerBag().remove(j);
-                            tiles.getTiles().add(tiles.getPlayerBag().get(j));
-                            Collections.shuffle(tiles.getTiles());
-
-                        }
-                tiles.setNewPlayerBag(letters.length());
-                System.out.println("Your tiles now are "+ tiles.getPlayerBag());
-
-
-
-
-            }
-        }while(!letterExist);
     }
-    void enterWord() {
 
-        System.out.println("Your remaining letters are " + tiles.getPlayerBag());
-        String k, l;
-        int x = 0,y = 0;
-        int i;
-        do {
-            System.out.println("Please select coordinate x or y for word expansion ");
-            Scanner sc = new Scanner(System.in);
-            coord = sc.next();
-        }while (!coord.equals("x") && !coord.equals("y"));
-
-        do {
-            System.out.println("Please select coordinates x,y");
-            k = sc.next();
-            l = sc.next();
-            if(ill.isInteger(k) && ill.isInteger(l)) {
-                x = parseInt(k);
-                y = parseInt(l);
-            }
-            else
-                System.out.println("Not valid coordinates.");
-        } while (!ill.validCoordinate(x, y  ) ||isField(x, y) || !ill.isInteger(k) || !ill.isInteger(l));
-
-
-
-
-            System.out.println("Please enter a word. ");
-            word = sc.next().toUpperCase();
-
-            for (i = 0; i < word.length(); i++) {
-                if (coord.equals("x")) {
-                    if (!ill.validCoordinate(x, y + i) || isField(x, y + i) )
-                        y = y + i;
-                        break;
-                } else if ( !ill.validCoordinate(x + i, y) || isField(x + i, y))
-                    x = x + i;
-                    break;
-
-        } while (!ill.noMoreTiles(word,tiles.getPlayerBag()) || ill.wordExists(word , wordsWritten )
-                ||  !ill.validCoordinate( x, y) || !ill.validCoordinate(x , y)
-                || isField(x, y )) {
-            System.out.println("Word not valid please enter another word with the remaining tiles and inside the bounds. ");
-            word = sc.next().toUpperCase();
-
-            for (i = 0; i < word.length(); i++) {
-                if (coord.equals("x")) {
-                    if ( !ill.validCoordinate(x, y + i) || isField(x, y + i) )
-                        break;
-                } else if ( !ill.validCoordinate(x + i, y) || isField(x + i, y) )
-                    break;
-
-            }
+    boolean checkBagLetters(String letters, ArrayList<Map.Entry<Character, Integer>> lettersArray) {
+        boolean letterExist = false;
+        for (int i = 0; i < letters.length(); i++) {
+            if (!tiles.getPlayerBag().contains(lettersArray.get(i))) {
+                break;
+            } else letterExist = true;
         }
-        wordsWritten.add(word) ;
-        if (coord.equals("x")) {
-            setXCoordinate(x , y);
-        } else
-            setYCoordinate(x,y);
+        return letterExist;
+    }
 
-        setScore(x, y,coord, word);
+    ArrayList<Map.Entry<Character, Integer>> getLettersArray(String letters) {
+        ArrayList<Map.Entry<Character, Integer>> lettersArray = new ArrayList<>();
+        for (int i = 0; i < letters.length(); i++) {
+            char key = letters.charAt(i);
+            lettersArray.add(Map.entry(key, tiles.getTilesValues().get(key)));
+        }
+        return lettersArray;
+    }
+
+    void skipTurn() {
+        String letters;
+        String skip = "skip!".toUpperCase();
+        ArrayList<Map.Entry<Character, Integer>> lettersArray;
+        boolean letterExist;
+        do {
+            System.out.println("Select letters to replace or enter 'skip!' to skip.");
+            letters = sc.next().toUpperCase();
+            if (letters.equals(skip))
+                break;
+
+            lettersArray = getLettersArray(letters);
+            letterExist = checkBagLetters(letters, lettersArray);
+            if (letterExist) {
+                swapLetters(letters);
+                System.out.println("Your tiles now are " + tiles.getPlayerBag());
+            }
+        } while (!letterExist);
+    }
+
+    boolean validateCoordinate(String k, String l) {
+        boolean trueCoord = false;
+        int x = 0, y = 0;
+        if (ill.isInteger(k) && ill.isInteger(l)) {
+            x = parseInt(k);
+            y = parseInt(l);
+
+        } else return false;
+        if (ill.validCoordinate(x, y))
+            trueCoord = true;
+        return trueCoord;
+
+    }
+
+    void enterWord() {
+        removeBagTiles(tiles.getPlayerBag() , word);
+        String k, l;
+        int x ,y;
+        getWordDirection();
+        do {
+            do {
+                System.out.println("Please select coordinates x,y");
+                k = sc.next();
+                l = sc.next();
+            } while (!validateCoordinate(k, l));
+            x = parseInt(k);
+            y = parseInt(l);
+            if (coord.equals("x"))
+                do {
+                    word = getWord().toUpperCase();
+                } while (!ill.validCoordinate(x, word.length() - 1 + y));
+            else do {
+                word = getWord().toUpperCase();
+            } while (!ill.validCoordinate(x + word.length() - 1, y));
+        } while (!ill.noMoreTiles(word, tiles.getPlayerBag()) && !ill.validWordPlacement(x, y, coord, word, board));
+
+
+        System.out.println(ill.validCoordPlacement(x, y, coord, word, board));
+        System.out.println(ill.validWordPlacement(x, y, coord, word, board));
+        System.out.println(ill.noMoreTiles(word, tiles.getPlayerBag()));
+        System.out.println(ill.validCoordinate(x, y));
+
+        wordsWritten.add(word);
+        if (coord.equals("x")) {
+            setYCoordinate(x, y , word);
+        } else
+            setXCoordinate(x, y , word);
+
+        setScore(x, y, coord, word);
         int score = getScore();
-        tiles.setNewPlayerBag(word.length());
         tiles.getPlayerBag();
         setNewBoard();
         getNewBoard();
         System.out.println("Your remaining letters are " + tiles.getPlayerBag());
-        System.out.println("General bag "+tiles.getTiles());
+        System.out.println("General bag " + tiles.getTiles());
         System.out.println(tiles.getPlayerBag().size());
         System.out.println(tiles.getTiles().size());
         System.out.println(score);
     }
+
+
 
     void setScore(int x, int y, String coord ,  String word) {
         setFieldsScore();

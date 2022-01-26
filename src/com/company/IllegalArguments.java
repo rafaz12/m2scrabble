@@ -23,47 +23,106 @@ public class IllegalArguments {
             return true;
         return false;
     }
+    boolean validCoordPlacement(int i , int j ,String coord, String word, String [][] board) {
+        boolean valid = false;
+        for (int x = 0; x < word.length(); x++) {
+            if (coord.equals("x")) {
+                if (!board[i][j + x + 1].equals("- ") || !board[i][j + x - 1].equals("- ") || !board[i + 1][j + x].equals("- ") || !board[i - 1][j + x].equals("- ")) {
+                    valid = true;
+                    break;
+                }
+            } else {
+                if (!board[i + x][j + 1].equals("- ") || !board[i + x][j - 1].equals("- ") || !board[i + 1 + x][j].equals("- ") || !board[i + x - 1][j].equals("- ")) {
+                    valid = true;
+                    break;
+                }
+                }
+            }
+            return valid;
+        }
+        boolean checkNoLetter(int i , int j, String [][] board ) {
+            boolean noLetter = false;
+                    if (board[i][j].equals(("- ")))
+                        noLetter = true;
+                     else {
+                         noLetter = false;
+
+
+                }
+            return noLetter;
+        }
+          boolean checkSameLetter(int i , int j , String ch , String [][] board ) {
+              boolean sameLetter = false;
+                      if (board[i][j].equals(ch))
+                          sameLetter = true;
+                      else {
+                          sameLetter = false;
+
+                      }
+                  return sameLetter;
+
+          }
+        boolean validWordPlacement( int i , int j , String coord,String word , String [][] board) {
+            boolean valid = false;
+            if(coord.equals("x")){
+                for(int k = 0 ; k< word.length(); k++){
+                    if(checkNoLetter( i ,j + k , board) || checkSameLetter(i ,j +k ,String.valueOf(word.charAt(k)),board))
+                        valid = true;
+                    else {
+                        valid = false;
+                        break;
+                    }
+                }
+            }
+            else{
+                for(int k = 0 ; k< word.length(); k++){
+                    if(checkNoLetter( i + k,j , board) || checkSameLetter(i + k ,j  ,String.valueOf(word.charAt(k)),board))
+                        valid = true;
+                    else {
+                        valid = false;
+                        break;
+                    }
+                }
+            }
+
+            return valid;
+        }
+
     boolean wordExists(String word , ArrayList<String> words){
         if(words.contains(word))
             return true;
         return false;
     }
-    boolean noMoreTiles(String word , ArrayList<Map.Entry<Character, Integer>> tiles) {
-        ArrayList<Character> removedLetters = new ArrayList<>();
-        ArrayList<Map.Entry<Character, Integer>> tilesClone =  new ArrayList<>(tiles);
-        boolean availTile= false;
+    /*
+    Checks if there exist the desired tiles in the bag.
+     */
+    boolean noMoreTiles(String word , ArrayList<Map.Entry<Character, Integer>> playerBag) {
+        boolean availTile = false;
         for( int k = 0; k<word.length(); k++){
             availTile = false;
-            for(int m = 0; m< tiles.size(); m++){
-                if(tiles.get(m).getKey().equals(word.charAt(k))){
-                    removedLetters.add(tiles.get(m).getKey());
-                    tiles.remove(tiles.get(m));
+            for(int m = 0; m< playerBag.size(); m++){
+                if(playerBag.get(m).getKey().equals(word.charAt(k)) || String.valueOf(playerBag.get(m).getKey()).equals(" ") ){
                     availTile = true;
                     break;
                 }
-
             }
-            if(!availTile) {
-                for (int i = 0; i< removedLetters.size(); i++){
-                    for(int m = 0; m< tilesClone.size(); m++){
-                       if(tilesClone.get(m).getKey().equals(removedLetters.get(i))) {
-                           tiles.add(tilesClone.get(m));
-                           break;
-
-                       }
-
-
-                    }
-                }
-                return false;
-                }
-
             }
-
-
-
-
         return availTile;
+    }
+
+    public static void main(String[] args) {
+        IllegalArguments ill = new IllegalArguments();
+        String[][] board = new String[10][10];
+
+        for( int i = 0 ; i<10; i ++) {
+            for (int j = 0; j < 10; j++) {
+                board[i][j] ="- ";
+            }
+        }
+
+        board[0][0] = "T";
+
+        System.out.println(ill.validWordPlacement(0,0,"x","Takis", board));
     }
 
 }
