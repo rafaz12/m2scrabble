@@ -91,36 +91,53 @@ public class Board {
         return word;
     }
 
-    void updateBagTiles(ArrayList<Map.Entry<Character, Integer>> playerBag , String word) {
-        for (int x = 0; x < word.length(); x++)
-            for (int m = 0; m < playerBag.size(); m++) {
-                if (playerBag.get(m).getKey().equals(word.charAt(x)) || String.valueOf(playerBag.get(m).getKey()).equals(" ")) {
-                    playerBag.remove(playerBag.get(m));
-                    Collections.shuffle(tiles.getTiles());
-                    playerBag.add(tiles.getTiles().get(m));
-                    this.tiles.getTiles().remove(playerBag.get(m));
-                }
-            }
+    void addRemove(ArrayList<Map.Entry<Character,Integer>> playerBag, int m){
+        System.out.println(playerBag.get(m));
+        playerBag.remove(playerBag.get(m));
+        Collections.shuffle(tiles.getTiles());
+        playerBag.add(tiles.getTiles().get(m));
+        this.tiles.getTiles().remove(tiles.getTiles().get(m));
     }
 
-    void enterFirstWord() {
+    void updateBagTiles(ArrayList<Map.Entry<Character, Integer>> playerBag , String word, int i , int j , String[][] board) {
+        for (int x = 0; x < word.length(); x++){
+            for (int m = 0; m < playerBag.size(); m++) {
+                    if (playerBag.get(m).getKey().equals(word.charAt(x)) || ill.checkNoLetter(i,j,this.board)) {
+                        playerBag.remove(playerBag.get(m));
+                        Collections.shuffle(tiles.getTiles());
+                        playerBag.add(tiles.getTiles().get(m));
+                        this.tiles.getTiles().remove(tiles.getTiles().get(m));
+                        break;
+                    } else if (playerBag.get(m).getKey().equals(' ') || ill.checkNoLetter(i,j, this.board)) {
+                        playerBag.remove(playerBag.get(m));
+                        Collections.shuffle(tiles.getTiles());
+                        playerBag.add(tiles.getTiles().get(m));
+                        this.tiles.getTiles().remove(tiles.getTiles().get(m));
+                        break;
+                    }
+                }
+            }
+            }
+
+
+
+
+    void enterFirstWord(){
         tiles = new Tiles();
         tiles.setTiles();
         tiles.setPlayerBag();
         remainingLetters(tiles.getPlayerBag());
         remainingLetters(tiles.getTiles());
         String coord = getWordDirection();
-        String word;
         do {
             word = getWord();
-        } while (!ill.validCoordinate(7 + word.length() - 1, 7) || !ill.validCoordinate(7, 7 + word.length() - 1) || !ill.noMoreTiles(word, tiles.getPlayerBag()));
+        } while (!ill.validCoordinate(7 + word.length() - 1, 7) || !ill.validCoordinate(7, 7 + word.length() - 1) || !checkBagLetters(word,getLettersArray(word)));
 
         if (coord.equals("x")) {
             setYCoordinate(7, 7 , word);
         } else
             setXCoordinate(7, 7 , word);
-
-        updateBagTiles(this.tiles.getPlayerBag(), word);
+        updateBagTiles(this.tiles.getPlayerBag(), this.word, 7, 7,this.board);
         wordsWritten.add(word);
         setScore(7, 7, coord, word);
         score = getScore();
@@ -129,7 +146,6 @@ public class Board {
         System.out.println("Your score is: " + score);
         remainingLetters(tiles.getPlayerBag());
         remainingLetters(tiles.getTiles());
-
     }
 
     void swapLetters(String letters ) {
@@ -141,17 +157,37 @@ public class Board {
                     Collections.shuffle(tiles.getTiles());
                     tiles.getPlayerBag().add(tiles.getTiles().get(j));
                     tiles.getTiles().remove(tiles.getPlayerBag().get(j));
-
                 }
+    }
+    boolean checkBlankTile(ArrayList<Map.Entry<Character, Integer>> playerBag){
+        if(playerBag.contains(' '))
+            return true;
+        return false;
+    }
+    int getBlankTiles(ArrayList<Map.Entry<Character, Integer>> playerBag){
+        int c = 0;
+        for( int i = 0; i< playerBag.size(); i++){
+            if(playerBag.get(i).getKey().equals(' '))
+                c++;
+        }
+        return c;
     }
 
     boolean checkBagLetters(String letters, ArrayList<Map.Entry<Character, Integer>> lettersArray) {
+        int counter = 0;
         boolean letterExist = false;
         for (int i = 0; i < letters.length(); i++) {
-            if (!tiles.getPlayerBag().contains(lettersArray.get(i))) {
+            if(tiles.getTiles().contains(lettersArray.get(i)))
+                letterExist = true;
+            else if (!tiles.getPlayerBag().contains(lettersArray.get(i)) && !checkBlankTile(tiles.getPlayerBag())) {
                 break;
-            } else letterExist = true;
+            } else {
+                getBlankTiles(tiles.getPlayerBag());
+                 counter++;
+            }
         }
+        if(counter == getBlankTiles(tiles.getPlayerBag()))
+            letterExist = true;
         return letterExist;
     }
 
@@ -195,11 +231,9 @@ public class Board {
         if (ill.validCoordinate(x, y))
             trueCoord = true;
         return trueCoord;
-
     }
 
     void enterWord() {
-        updateBagTiles(tiles.getPlayerBag() , word);
         String k, l;
         int x ,y;
         getWordDirection();
@@ -218,7 +252,7 @@ public class Board {
             else do {
                 word = getWord().toUpperCase();
             } while (!ill.validCoordinate(x + word.length() - 1, y));
-        } while (!ill.noMoreTiles(word, tiles.getPlayerBag()) || !ill.validWordPlacement(x, y, coord, word, board) ||
+        } while ( !ill.validWordPlacement(x, y, coord, word, board) || !checkBagLetters(word,getLettersArray(word)) ||
                 !ill.validCoordPlacement(x, y, coord, word, board) || ill.wordExists(word,wordsWritten));
         wordsWritten.add(word);
         if (coord.equals("x")) {
@@ -227,7 +261,7 @@ public class Board {
             setXCoordinate(x, y , word);
         setScore(x, y, coord, word);
         int score = getScore();
-        updateBagTiles(this.tiles.getPlayerBag(), word);
+        updateBagTiles(this.tiles.getPlayerBag(), word, x, y,board);
         updateBoard(this.tiles.getPlayerBag());
 
     }

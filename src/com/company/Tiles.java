@@ -81,12 +81,6 @@ public class Tiles {
             generalTiles.remove(generalTiles.get(i));
         }
 
-    }
-    void setNewPlayerBag(int i ){
-        for ( int j = 0; j < i; j++){
-            playerBag.add(generalTiles.get(j));
-            generalTiles.remove(j);
-        }
 
     }
     ArrayList<Map.Entry<Character, Integer>> getPlayerBag() {
@@ -104,7 +98,6 @@ public class Tiles {
     void setTiles(){
         ArrayList<Map.Entry<Character, Integer>> setTiles = new ArrayList<>();
         generalTiles = new ArrayList<>();
-
         Set<Map.Entry<Character,Integer>> set = tiles.entrySet();
         for (Map.Entry<Character, Integer> t : set)
             setTiles.add(t);

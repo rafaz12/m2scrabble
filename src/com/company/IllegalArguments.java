@@ -46,13 +46,11 @@ public class IllegalArguments {
                         noLetter = true;
                      else {
                          noLetter = false;
-
-
                 }
             return noLetter;
         }
           boolean checkSameLetter(int i , int j , String ch , String [][] board ) {
-              boolean sameLetter = false;
+              boolean sameLetter;
                       if (board[i][j].equals(ch))
                           sameLetter = true;
                       else {
@@ -60,7 +58,6 @@ public class IllegalArguments {
 
                       }
                   return sameLetter;
-
           }
         boolean validWordPlacement( int i , int j , String coord,String word , String [][] board) {
             boolean valid = false;
@@ -96,19 +93,7 @@ public class IllegalArguments {
     /*
     Checks if there exist the desired tiles in the bag.
      */
-    boolean noMoreTiles(String word , ArrayList<Map.Entry<Character, Integer>> playerBag) {
-        boolean availTile = false;
-        for( int k = 0; k<word.length(); k++){
-            availTile = false;
-            for(int m = 0; m< playerBag.size(); m++){
-                if(playerBag.get(m).getKey().equals(word.charAt(k)) || String.valueOf(playerBag.get(m).getKey()).equals(" ") ){
-                    availTile = true;
-                    break;
-                }
-            }
-            }
-        return availTile;
-    }
+
 
     public static void main(String[] args) {
         IllegalArguments ill = new IllegalArguments();
