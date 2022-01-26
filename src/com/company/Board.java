@@ -91,14 +91,14 @@ public class Board {
         return word;
     }
 
-    void removeBagTiles(ArrayList<Map.Entry<Character, Integer>> playerBag , String word) {
-
+    void updateBagTiles(ArrayList<Map.Entry<Character, Integer>> playerBag , String word) {
         for (int x = 0; x < word.length(); x++)
             for (int m = 0; m < playerBag.size(); m++) {
                 if (playerBag.get(m).getKey().equals(word.charAt(x)) || String.valueOf(playerBag.get(m).getKey()).equals(" ")) {
-                    tiles.getTiles().add(playerBag.get(m));
                     playerBag.remove(playerBag.get(m));
-
+                    Collections.shuffle(tiles.getTiles());
+                    playerBag.add(tiles.getTiles().get(m));
+                    this.tiles.getTiles().remove(playerBag.get(m));
                 }
             }
     }
@@ -120,11 +120,10 @@ public class Board {
         } else
             setXCoordinate(7, 7 , word);
 
-        removeBagTiles(tiles.getPlayerBag() , word);
+        updateBagTiles(this.tiles.getPlayerBag(), word);
         wordsWritten.add(word);
         setScore(7, 7, coord, word);
         score = getScore();
-        tiles.setNewPlayerBag(word.length());
         setNewBoard();
         getNewBoard();
         System.out.println("Your score is: " + score);
@@ -133,14 +132,16 @@ public class Board {
 
     }
 
-    void swapLetters(String letters) {
+    void swapLetters(String letters ) {
         for (int i = 0; i < letters.length(); i++)
             for (int j = 0; j < tiles.getPlayerBag().size(); j++)
                 if (tiles.getPlayerBag().get(j).getKey().equals(letters.charAt(i))) {
                     tiles.getTiles().add(tiles.getPlayerBag().get(j));
                     tiles.getPlayerBag().remove(tiles.getPlayerBag().get(j));
                     Collections.shuffle(tiles.getTiles());
-                    tiles.setNewPlayerBag(letters.length());
+                    tiles.getPlayerBag().add(tiles.getTiles().get(j));
+                    tiles.getTiles().remove(tiles.getPlayerBag().get(j));
+
                 }
     }
 
@@ -169,7 +170,7 @@ public class Board {
         ArrayList<Map.Entry<Character, Integer>> lettersArray;
         boolean letterExist;
         do {
-            System.out.println("Select letters to replace or enter 'skip!' to skip.");
+            System.out.println( "enter 'skip!' to skip or enter tiles to replace.");
             letters = sc.next().toUpperCase();
             if (letters.equals(skip))
                 break;
@@ -198,7 +199,7 @@ public class Board {
     }
 
     void enterWord() {
-        removeBagTiles(tiles.getPlayerBag() , word);
+        updateBagTiles(tiles.getPlayerBag() , word);
         String k, l;
         int x ,y;
         getWordDirection();
@@ -217,28 +218,25 @@ public class Board {
             else do {
                 word = getWord().toUpperCase();
             } while (!ill.validCoordinate(x + word.length() - 1, y));
-        } while (!ill.noMoreTiles(word, tiles.getPlayerBag()) && !ill.validWordPlacement(x, y, coord, word, board));
-
-
-        System.out.println(ill.validCoordPlacement(x, y, coord, word, board));
-        System.out.println(ill.validWordPlacement(x, y, coord, word, board));
-        System.out.println(ill.noMoreTiles(word, tiles.getPlayerBag()));
-        System.out.println(ill.validCoordinate(x, y));
-
+        } while (!ill.noMoreTiles(word, tiles.getPlayerBag()) || !ill.validWordPlacement(x, y, coord, word, board) ||
+                !ill.validCoordPlacement(x, y, coord, word, board) || ill.wordExists(word,wordsWritten));
         wordsWritten.add(word);
         if (coord.equals("x")) {
             setYCoordinate(x, y , word);
         } else
             setXCoordinate(x, y , word);
-
         setScore(x, y, coord, word);
         int score = getScore();
-        tiles.getPlayerBag();
+        updateBagTiles(this.tiles.getPlayerBag(), word);
+        updateBoard(this.tiles.getPlayerBag());
+
+    }
+    void updateBoard(ArrayList<Map.Entry<Character,Integer>> playerBag ){
         setNewBoard();
         getNewBoard();
-        System.out.println("Your remaining letters are " + tiles.getPlayerBag());
+        System.out.println("Your remaining letters are " + playerBag);
         System.out.println("General bag " + tiles.getTiles());
-        System.out.println(tiles.getPlayerBag().size());
+        System.out.println(playerBag.size());
         System.out.println(tiles.getTiles().size());
         System.out.println(score);
     }
@@ -250,6 +248,8 @@ public class Board {
         int[][] arr = getFieldPoints();
         int dredCount = 0;
         int predCount = 0;
+        if(word.length() == 7)
+            score = score + 50;
         if (coord.equals("x")) {
             for (k = 0; k < word.length(); k++) {
                 if (arr[x][y + k] == dred) {

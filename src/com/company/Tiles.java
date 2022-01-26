@@ -90,10 +90,10 @@ public class Tiles {
 
     }
     ArrayList<Map.Entry<Character, Integer>> getPlayerBag() {
-        if(playerBag.contains(Map.entry(" ",0))){
-            int temp = playerBag.indexOf(Map.entry(" ",0));
-            playerBag.get(temp).equals(playerBag.get(playerBag.size()-1));
-            playerBag.get(playerBag.size()-1).equals(Map.entry(" ",0));
+        if(playerBag.contains(Map.entry(' ',0))){
+            int temp = playerBag.indexOf(Map.entry(' ',0));
+            playerBag.remove(temp);
+            playerBag.add(Map.entry(' ',0));
 
         }
         return this.playerBag;
