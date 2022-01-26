@@ -23,31 +23,122 @@ public class IllegalArguments {
             return true;
         return false;
     }
+
+    boolean checkSurrounding(int i, int j, String[][] board) {
+        return (checkNorth(i, j ,board) || checkEast(i, j ,board)) || checkSouth(i, j , board) || checkWest(i, j, board);
+    }
+
+    boolean checkNorth(int i, int j, String[][] board) {
+        if (i == 0) {
+            return false;
+        }
+        return !checkNoLetter(i - 1, j, board);
+    }
+
+    boolean checkEast(int i, int j, String board[][]) {
+        if (j >= 14) {
+            return false;
+        }
+        return !checkNoLetter(i, j + 1, board);
+    }
+
+    boolean checkSouth(int i, int j, String board[][]) {
+        if (i >= 14) {
+            return false;
+        }
+        return !checkNoLetter(i + 1, j , board);
+    }
+
+    boolean checkWest(int i, int j, String board[][]) {
+        if (j <= 0) {
+            return false;
+        }
+        return !checkNoLetter(i, j - 1, board);
+    }
     boolean validCoordPlacement(int i , int j ,String coord, String word, String [][] board) {
         boolean valid = false;
         for (int x = 0; x < word.length(); x++) {
             if (coord.equals("x")) {
-                if (!board[i][j + x + 1].equals("- ") || !board[i][j + x - 1].equals("- ") || !board[i + 1][j + x].equals("- ") || !board[i - 1][j + x].equals("- ")) {
+                if (checkSurrounding(i, j + x, board))
                     valid = true;
-                    break;
-                }
+                break;
+
             } else {
-                if (!board[i + x][j + 1].equals("- ") || !board[i + x][j - 1].equals("- ") || !board[i + 1 + x][j].equals("- ") || !board[i + x - 1][j].equals("- ")) {
+                if (checkSurrounding(i + x, j, board)) {
                     valid = true;
                     break;
                 }
+
+            }
+        }
+        return valid;
+    }
+        String reverseWord(String word){
+            StringBuilder reverseWord = new StringBuilder();
+            reverseWord.append(word);
+            reverseWord.reverse();
+            return reverseWord.toString();
+        }
+
+        String getRightWord(int i, int j ,String word, String[][] board){
+            boolean empty = false;
+            String rightWord ="";
+            int rightCoord = word.length() + j;
+            while(!empty) {
+                empty = true;
+                if (checkNoLetter(i, rightCoord, board)) {
+                    empty = false;
+                    rightWord = rightWord+board[i][rightCoord];
+                    rightCoord++;
                 }
             }
-            return valid;
+            return rightWord;
+        }
+        String getLeftWord(int i, int j ,String[][] board){
+        boolean empty = false;
+            String leftWord ="";
+            int leftCoord = j - 1;
+            while(!empty) {
+                empty = true;
+                if (checkNoLetter(i, leftCoord, board)) {
+                    empty = false;
+                    leftWord = leftWord+board[i][leftCoord];
+                    leftCoord--;
+                }
+            }
+            return reverseWord(leftWord);
+        }
+
+        String getAboveWord(int i, int j ,String[][] board){
+            boolean empty = false;
+            String aboveWord ="";
+            int aboveCoord = i - 1;
+            while(!empty) {
+                empty = true;
+                if (checkNoLetter(aboveCoord, j, board)) {
+                    empty = false;
+                    aboveWord = aboveWord+board[aboveCoord][j];
+                    aboveCoord--;
+                }
+            }
+            return reverseWord(aboveWord);
+        }
+        String getBelowWord(int i, int j,String word ,String[][] board){
+            boolean empty = false;
+            String belowWord ="";
+            int belowCoord = word.length() + i;
+            while(!empty) {
+                empty = true;
+                if (checkNoLetter(belowCoord, j, board)) {
+                    empty = false;
+                    belowWord = belowWord+board[belowCoord][j];
+                    belowCoord++;
+                }
+            }
+            return belowWord;
         }
         boolean checkNoLetter(int i , int j, String [][] board ) {
-            boolean noLetter = false;
-                    if (board[i][j].equals(("- ")))
-                        noLetter = true;
-                     else {
-                         noLetter = false;
-                }
-            return noLetter;
+            return board[i][j].equals("- ");
         }
           boolean checkSameLetter(int i , int j , String ch , String [][] board ) {
               boolean sameLetter;
