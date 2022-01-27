@@ -11,7 +11,7 @@ public class Dictionary {
     String word;
     public Dictionary(){
         HashSet<String> wordSet = new HashSet<>();
-        File file = new File("src/words.txt");
+        File file = new File("C:\\\\Users\\\\User\\\\Downloads\\\\m2scrabble\\\\words.txt");
         try{
             Scanner read = new Scanner(file);
             while(read.hasNextLine()){
@@ -28,5 +28,10 @@ public class Dictionary {
     }
     boolean contains(String word){
         return this.words.contains(word.toLowerCase());
+    }
+
+    public static void main(String[] args) {
+        Dictionary d = new Dictionary();
+        System.out.println(d.contains("day"));
     }
 }

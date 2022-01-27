@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class IllegalArguments {
+    Dictionary dic = new Dictionary();
     public IllegalArguments(){
 
     }
@@ -73,70 +74,10 @@ public class IllegalArguments {
         }
         return valid;
     }
-        String reverseWord(String word){
-            StringBuilder reverseWord = new StringBuilder();
-            reverseWord.append(word);
-            reverseWord.reverse();
-            return reverseWord.toString();
+        boolean checkDictionary(String word){
+        return dic.contains(word);
         }
 
-        String getRightWord(int i, int j ,String word, String[][] board){
-            boolean empty = false;
-            String rightWord ="";
-            int rightCoord = word.length() + j;
-            while(!empty) {
-                empty = true;
-                if (checkNoLetter(i, rightCoord, board)) {
-                    empty = false;
-                    rightWord = rightWord+board[i][rightCoord];
-                    rightCoord++;
-                }
-            }
-            return rightWord;
-        }
-        String getLeftWord(int i, int j ,String[][] board){
-        boolean empty = false;
-            String leftWord ="";
-            int leftCoord = j - 1;
-            while(!empty) {
-                empty = true;
-                if (checkNoLetter(i, leftCoord, board)) {
-                    empty = false;
-                    leftWord = leftWord+board[i][leftCoord];
-                    leftCoord--;
-                }
-            }
-            return reverseWord(leftWord);
-        }
-
-        String getAboveWord(int i, int j ,String[][] board){
-            boolean empty = false;
-            String aboveWord ="";
-            int aboveCoord = i - 1;
-            while(!empty) {
-                empty = true;
-                if (checkNoLetter(aboveCoord, j, board)) {
-                    empty = false;
-                    aboveWord = aboveWord+board[aboveCoord][j];
-                    aboveCoord--;
-                }
-            }
-            return reverseWord(aboveWord);
-        }
-        String getBelowWord(int i, int j,String word ,String[][] board){
-            boolean empty = false;
-            String belowWord ="";
-            int belowCoord = word.length() + i;
-            while(!empty) {
-                empty = true;
-                if (checkNoLetter(belowCoord, j, board)) {
-                    empty = false;
-                    belowWord = belowWord+board[belowCoord][j];
-                    belowCoord++;
-                }
-            }
-            return belowWord;
-        }
         boolean checkNoLetter(int i , int j, String [][] board ) {
             return board[i][j].equals("- ");
         }

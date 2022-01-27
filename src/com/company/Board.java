@@ -19,6 +19,7 @@ public class Board {
     private int[][] fieldPoints;
     private Coordinates coordinates = new Coordinates();
     private Tiles tiles;
+    private Dictionary dic = new Dictionary();
     private int c = 0;
     private ArrayList<String> wordsWritten = new ArrayList<>();
     private int score = 0, m = 0, k = 0;
@@ -90,6 +91,117 @@ public class Board {
 
         return word;
     }
+    String reverseWord(String word){
+        StringBuilder reverseWord = new StringBuilder();
+        reverseWord.append(word);
+        reverseWord.reverse();
+        return reverseWord.toString();
+    }
+    boolean checkListWordsHorizontal(int i, int j , String word, String[][] board){
+        boolean validWord = false;
+        ArrayList<String> words = new ArrayList<>();
+        String horizontalWord;
+        String verticalWord;
+        words.add(word);
+
+            horizontalWord = getLeftWord(i,j,board)+word+getRightWord(i,j,word,board);
+            words.add(horizontalWord);
+            for(int x = 0; x< word.length(); x++){
+                verticalWord= getAboveWord(i,j,board)+word.charAt(x)+getBelowWord(i,j,String.valueOf(word.charAt(x)),board);
+                words.add(verticalWord);
+                validWord = false;
+                if (ill.checkDictionary(words.get(x)) || words.get(x).length() ==1) {
+                    validWord = true;
+                }
+                else break;
+
+            }
+         return validWord;
+    }
+    boolean checkListWords(String coord,int i, int j , String word, String[][] board){
+        if(coord.equals("x"))
+            return checkListWordsHorizontal( i, j ,word, board);
+        else
+           return checkListWordsVertical( i, j ,word, board);
+    }
+
+    boolean checkListWordsVertical(int i, int j , String word, String[][] board){
+        boolean validWord = false;
+        ArrayList<String> words = new ArrayList<>();
+        String horizontalWord;
+        String verticalWord;
+        words.add(word);
+        verticalWord = getAboveWord(i,j,board)+word+getBelowWord(i,j,word,board);
+        words.add(verticalWord);
+        for(int x = 0; x< word.length(); x++){
+            horizontalWord= getLeftWord(i,j,board)+word.charAt(x)+getRightWord(i,j,String.valueOf(word.charAt(x)),board);
+            words.add(horizontalWord);
+            validWord = false;
+            if (ill.checkDictionary(words.get(x)) || (words.get(x).length() == 1))
+                validWord = true;
+            else break;
+        }
+        return validWord;
+    }
+
+
+    String getRightWord(int i, int j ,String word, String[][] board){
+        boolean empty = false;
+        String rightWord ="";
+        int rightCoord = word.length() + j;
+        while(!empty && rightCoord < 15) {
+            empty = true;
+            if (!ill.checkNoLetter(i, rightCoord, board)) {
+                empty = false;
+                rightWord = rightWord+board[i][rightCoord];
+                rightCoord++;
+            }
+        }
+        return rightWord;
+    }
+    String getLeftWord(int i, int j ,String[][] board){
+        boolean empty = false;
+        String leftWord ="";
+        int leftCoord = j - 1;
+        while(!empty && leftCoord >= 0) {
+            empty = true;
+            if (!ill.checkNoLetter(i, leftCoord, board)) {
+                empty = false;
+                leftWord = leftWord+board[i][leftCoord];
+                leftCoord--;
+            }
+        }
+        return reverseWord(leftWord);
+    }
+
+    String getAboveWord(int i, int j ,String[][] board){
+        boolean empty = false;
+        String aboveWord ="";
+        int aboveCoord = i - 1;
+        while(!empty && (aboveCoord >= 0)) {
+            empty = true;
+            if (!ill.checkNoLetter(aboveCoord, j, board)) {
+                empty = false;
+                aboveWord = aboveWord+board[aboveCoord][j];
+                aboveCoord--;
+            }
+        }
+        return reverseWord(aboveWord);
+    }
+    String getBelowWord(int i, int j,String word ,String[][] board){
+        boolean empty = false;
+        String belowWord ="";
+        int belowCoord = word.length() + i;
+        while(!empty && belowCoord < 15) {
+            empty = true;
+            if (!ill.checkNoLetter(belowCoord, j, board)) {
+                empty = false;
+                belowWord = belowWord+board[belowCoord][j];
+                belowCoord++;
+            }
+        }
+        return belowWord;
+    }
 
     void addRemove(ArrayList<Map.Entry<Character,Integer>> playerBag, int m){
         System.out.println(playerBag.get(m));
@@ -129,9 +241,14 @@ public class Board {
         remainingLetters(tiles.getPlayerBag());
         remainingLetters(tiles.getTiles());
         String coord = getWordDirection();
+
         do {
             word = getWord();
-        } while (!ill.validCoordinate(7 + word.length() - 1, 7) || !ill.validCoordinate(7, 7 + word.length() - 1) || !checkBagLetters(word,getLettersArray(word)));
+            System.out.println(dic.contains(word));
+
+        } while (!dic.contains(word) || !ill.validCoordinate(7 + word.length() - 1, 7)
+                || !ill.validCoordinate(7, 7 + word.length() - 1) ||
+                !checkBagLetters(word,getLettersArray(word)));
 
         if (coord.equals("x")) {
             setYCoordinate(7, 7 , word);
@@ -253,7 +370,8 @@ public class Board {
                 word = getWord().toUpperCase();
             } while (!ill.validCoordinate(x + word.length() - 1, y));
         } while ( !ill.validWordPlacement(x, y, coord, word, board) || !checkBagLetters(word,getLettersArray(word)) ||
-                !ill.validCoordPlacement(x, y, coord, word, board) || ill.wordExists(word,wordsWritten));
+                !ill.validCoordPlacement(x, y, coord, word, board) || ill.wordExists(word,wordsWritten)
+                || !checkListWords(coord, x, y, word, board));
         wordsWritten.add(word);
         if (coord.equals("x")) {
             setYCoordinate(x, y , word);
