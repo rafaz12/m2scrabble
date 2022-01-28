@@ -71,7 +71,7 @@ public class Tiles {
     }
 
     HashMap<Character, Integer> getTilesValues(){
-        return tiles;
+        return this.tiles;
     }
 
     void setPlayerBag(){

@@ -1,10 +1,6 @@
 package com.company;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class IllegalArguments {
     Dictionary dic = new Dictionary();
@@ -33,36 +29,37 @@ public class IllegalArguments {
         if (i == 0) {
             return false;
         }
-        return !checkNoLetter(i - 1, j, board);
+        return !checkEmpty(i - 1, j, board);
     }
 
     boolean checkEast(int i, int j, String board[][]) {
         if (j >= 14) {
             return false;
         }
-        return !checkNoLetter(i, j + 1, board);
+        return !checkEmpty(i, j + 1, board);
     }
 
     boolean checkSouth(int i, int j, String board[][]) {
         if (i >= 14) {
             return false;
         }
-        return !checkNoLetter(i + 1, j , board);
+        return !checkEmpty(i + 1, j , board);
     }
 
     boolean checkWest(int i, int j, String board[][]) {
         if (j <= 0) {
             return false;
         }
-        return !checkNoLetter(i, j - 1, board);
+        return !checkEmpty(i, j - 1, board);
     }
     boolean validCoordPlacement(int i , int j ,String coord, String word, String [][] board) {
         boolean valid = false;
         for (int x = 0; x < word.length(); x++) {
             if (coord.equals("x")) {
-                if (checkSurrounding(i, j + x, board))
+                if (checkSurrounding(i, j + x, board)) {
                     valid = true;
-                break;
+                    break;
+                }
 
             } else {
                 if (checkSurrounding(i + x, j, board)) {
@@ -78,8 +75,8 @@ public class IllegalArguments {
         return dic.contains(word);
         }
 
-        boolean checkNoLetter(int i , int j, String [][] board ) {
-            return board[i][j].equals("- ");
+        boolean checkEmpty(int i , int j, String [][] board ) {
+            return board[i][j].equals("-");
         }
           boolean checkSameLetter(int i , int j , String ch , String [][] board ) {
               boolean sameLetter;
@@ -95,7 +92,7 @@ public class IllegalArguments {
             boolean valid = false;
             if(coord.equals("x")){
                 for(int k = 0 ; k< word.length(); k++){
-                    if(checkNoLetter( i ,j + k , board) || checkSameLetter(i ,j +k ,String.valueOf(word.charAt(k)),board))
+                    if( checkSameLetter(i ,j +k ,String.valueOf(word.charAt(k)),board)|| checkEmpty( i ,j + k , board) )
                         valid = true;
                     else {
                         valid = false;
@@ -105,7 +102,7 @@ public class IllegalArguments {
             }
             else{
                 for(int k = 0 ; k< word.length(); k++){
-                    if(checkNoLetter( i + k,j , board) || checkSameLetter(i + k ,j  ,String.valueOf(word.charAt(k)),board))
+                    if( checkSameLetter(i + k ,j  ,String.valueOf(word.charAt(k)),board) || checkEmpty( i + k,j , board))
                         valid = true;
                     else {
                         valid = false;
@@ -133,13 +130,14 @@ public class IllegalArguments {
 
         for( int i = 0 ; i<10; i ++) {
             for (int j = 0; j < 10; j++) {
-                board[i][j] ="- ";
+                board[i][j] ="-";
             }
         }
 
-        board[0][0] = "T";
 
-        System.out.println(ill.validWordPlacement(0,0,"x","Takis", board));
+        board[0][1] = "a";
+
+        System.out.println(ill.validWordPlacement(0,0,"x","Ta", board));
     }
 
 }

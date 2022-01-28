@@ -1,7 +1,6 @@
 package com.company;
 
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 import static java.lang.Integer.parseInt;
@@ -15,8 +14,9 @@ import static java.lang.Integer.parseInt;
 public class Board {
     public static final int DIM = 15;
     private IllegalArguments ill = new IllegalArguments();
-    private static final int dred = 3, pred = 2, start = 2, dblue = 3, pblue = 2;
-    private int[][] fieldPoints;
+    private Integer dred = new Integer(3) , pred = new Integer(2), start = new Integer(2) , dblue = new Integer(3), pblue= new Integer(2);
+
+    private Integer[][] fieldPoints;
     private Coordinates coordinates = new Coordinates();
     private Tiles tiles;
     private Dictionary dic = new Dictionary();
@@ -37,18 +37,12 @@ public class Board {
      * @ensures all fields are EMPTY
      */
     public Board() {
-        fieldPoints = new int[DIM][DIM];
-        symbol = " ";
+        fieldPoints = new Integer[DIM][DIM];
+        String[][] newBoard = new String[DIM][DIM];
         for (int i = 0; i < DIM; i++)
             for (int j = 0; j < DIM; j++) {
-                if (j == 0)
-                    symbol = symbol + "\r\n";
-                board[i][j] = "- ";
-                symbol = symbol + board[i][j];
-
+                this.board[i][j] = "-";
             }
-        System.out.println(symbol);
-
     }
 
     int getTileNumbers() {
@@ -57,16 +51,14 @@ public class Board {
 
     void setYCoordinate(int x, int y, String word) {
         for (k = 0; k < word.length(); k++) {
-            this.board[x][y + k].equals(word.charAt(k));
-            this.board[x][y + k] = String.valueOf(word.charAt(k));
+            board[x][y + k] = String.valueOf(word.charAt(k));
         }
 
     }
 
     void setXCoordinate(int x, int y , String word) {
         for (k = 0; k < word.length(); k++) {
-            this.board[x + k][y].equals(word.charAt(k));
-            this.board[x + k][y] = String.valueOf(word.charAt(k));
+            board[x + k][y] = String.valueOf(word.charAt(k));
         }
     }
 
@@ -110,10 +102,10 @@ public class Board {
             horizontalWord = getLeftWord(i,j,board)+word+getRightWord(i,j,word,board);
             words.add(horizontalWord);
             for(int x = 0; x< word.length(); x++){
-                verticalWord= getAboveWord(i,j,board)+word.charAt(x)+getBelowWord(i,j,String.valueOf(word.charAt(x)),board);
+                verticalWord= getAboveWord(i,j + x ,board)+word.charAt(x)+getBelowWord(i,j + x,String.valueOf(word.charAt(x)),board);
                 words.add(verticalWord);
                 validWord = false;
-                if (ill.checkDictionary(words.get(x)) || words.get(x).length() ==1) {
+                if ((ill.checkDictionary(words.get(x)) || words.get(x).length() ==1) && !ill.wordExists(words.get(x), wordsWritten)) {
                     validWord = true;
                 }
                 else break;
@@ -121,6 +113,7 @@ public class Board {
             }
             if(validWord)
                 for(int c = 0; c <words.size(); c++){
+                    if(!wordsWritten.contains(words.get(c)));
                     newWordsFormed.add(words.get(c));
                 }
          return validWord;
@@ -158,7 +151,7 @@ public class Board {
         int rightCoord = word.length() + j;
         while(!empty && rightCoord < 15) {
             empty = true;
-            if (!ill.checkNoLetter(i, rightCoord, board)) {
+            if (!ill.checkEmpty(i, rightCoord, board)) {
                 empty = false;
                 rightWord = rightWord+board[i][rightCoord];
                 rightCoord++;
@@ -172,7 +165,7 @@ public class Board {
         int leftCoord = j - 1;
         while(!empty && leftCoord >= 0) {
             empty = true;
-            if (!ill.checkNoLetter(i, leftCoord, board)) {
+            if (!ill.checkEmpty(i, leftCoord, board)) {
                 empty = false;
                 leftWord = leftWord+board[i][leftCoord];
                 leftCoord--;
@@ -187,7 +180,7 @@ public class Board {
         int aboveCoord = i - 1;
         while(!empty && (aboveCoord >= 0)) {
             empty = true;
-            if (!ill.checkNoLetter(aboveCoord, j, board)) {
+            if (!ill.checkEmpty(aboveCoord, j, board)) {
                 empty = false;
                 aboveWord = aboveWord+board[aboveCoord][j];
                 aboveCoord--;
@@ -201,7 +194,7 @@ public class Board {
         int belowCoord = word.length() + i;
         while(!empty && belowCoord < 15) {
             empty = true;
-            if (!ill.checkNoLetter(belowCoord, j, board)) {
+            if (!ill.checkEmpty(belowCoord, j, board)) {
                 empty = false;
                 belowWord = belowWord+board[belowCoord][j];
                 belowCoord++;
@@ -229,13 +222,13 @@ public class Board {
     void updateBagTiles(ArrayList<Map.Entry<Character, Integer>> playerBag , String word, int i , int j , String[][] board) {
         for (int x = 0; x < word.length(); x++){
             for (int m = 0; m < playerBag.size(); m++) {
-                    if (playerBag.get(m).getKey().equals(word.charAt(x)) || ill.checkNoLetter(i,j,this.board)) {
+                    if (playerBag.get(m).getKey().equals(word.charAt(x)) || ill.checkEmpty(i,j,this.board)) {
                         playerBag.remove(playerBag.get(m));
                         Collections.shuffle(tiles.getTiles());
                         playerBag.add(tiles.getTiles().get(m));
                         this.tiles.getTiles().remove(tiles.getTiles().get(m));
                         break;
-                    } else if (playerBag.get(m).getKey().equals(' ') || ill.checkNoLetter(i,j, this.board)) {
+                    } else if (playerBag.get(m).getKey().equals(' ') || ill.checkEmpty(i,j, this.board)) {
                         playerBag.remove(playerBag.get(m));
                         Collections.shuffle(tiles.getTiles());
                         playerBag.add(tiles.getTiles().get(m));
@@ -296,14 +289,67 @@ public class Board {
                     setXCoordinate(x, y, word);
                 updateBagTiles(this.tiles.getPlayerBag(), this.word, x, y, this.board);
                 wordsWritten.add(word);
-                setWordScore(x, y, coord, word);
+                setScore(x, y, coord, word,board);
 
                 score = getScore();
-                setNewBoard();
-                getNewBoard();
+                printBoard();
                 System.out.println("Your score is: " + score);
                 remainingLetters(tiles.getPlayerBag());
                 remainingLetters(tiles.getTiles());
+    }
+
+    void testEnterFirstWord() {
+        String k, l;
+        int x, y, a , b, c = 0;
+        tiles = new Tiles();
+        tiles.setTiles();
+        tiles.setPlayerBag();
+        remainingLetters(tiles.getPlayerBag());
+        remainingLetters(tiles.getTiles());
+
+
+        do {
+            coord = "x";
+            do {
+                k = "7";
+                l = "5";
+            } while (!validateCoordinate(k, l));
+            x = parseInt(k);
+            y = parseInt(l);
+            a = x;
+            b = y;
+
+            word = "HORN";
+            if (coord.equals("x")) {
+                for (int i = 0; i < word.length(); i++) {
+                    a++;
+                    if (a == 7 && b == 7)
+                        c++;
+                }
+            } else {
+                for (int i = 0; i < word.length(); i++) {
+                    b++;
+                    if (a == 7 && b == 7)
+                        c++;
+                }
+            }
+        }while (!dic.contains(word) || !ill.validCoordinate(x + word.length() - 1, y)
+                || !ill.validCoordinate(x, y + word.length() - 1) //||
+                /*!checkBagLetters(word, getLettersArray(word))*/ && c !=1) ;
+
+        if (coord.equals("x")) {
+            setYCoordinate(x, y, word);
+        } else
+            setXCoordinate(x, y, word);
+        updateBagTiles(this.tiles.getPlayerBag(), this.word, x, y, this.board);
+        wordsWritten.add(word);
+        setScore(x, y, coord, word,board);
+
+        score = getScore();
+        printBoard();
+        System.out.println("Your score is: " + score);
+        remainingLetters(tiles.getPlayerBag());
+        remainingLetters(tiles.getTiles());
     }
 
 
@@ -392,6 +438,43 @@ public class Board {
         return trueCoord;
     }
 
+    void testEnterWord() {
+        int num =0;
+        do {
+            String k, l;
+            int x, y;
+            do {
+                do {
+                    k = "7";
+                    l = "4";
+                } while (!validateCoordinate(k, l));
+                x = parseInt(k);
+                y = parseInt(l);
+                if (coord.equals("x"))
+                    do {
+                        word = "THORN";
+                    } while (!ill.validCoordinate(x, word.length() - 1 + y));
+                else do {
+                    word = "Y";
+                } while (!ill.validCoordinate(x + word.length() - 1, y));
+            } while (!ill.validWordPlacement(x, y, coord, word, board)  || /*!checkBagLetters(word, getLettersArray(word))*/
+                    !ill.validCoordPlacement(x, y, coord, word, board) || ill.wordExists(word, wordsWritten)
+                            || !checkListWords(coord, x, y, word, board));
+            for(int z = 0; z< newWordsFormed.size(); z++){
+                wordsWritten.add(newWordsFormed.get(z));
+            }
+            if (coord.equals("x")) {
+                setYCoordinate(x, y, word);
+            } else
+                setXCoordinate(x, y, word);
+            setScore(x, y, coord, word,board);
+            int score = getScore();
+            updateBagTiles(this.tiles.getPlayerBag(), word, x, y, board);
+            updateBoard(this.tiles.getPlayerBag());
+            num++;
+        }while(num < 5);
+    }
+
     void enterWord() {
         int num =0;
         do {
@@ -413,12 +496,13 @@ public class Board {
                 else do {
                     word = getWord().toUpperCase();
                 } while (!ill.validCoordinate(x + word.length() - 1, y));
-            } while (/* !ill.validWordPlacement(x, y, coord, word, board)*/  /*!checkBagLetters(word, getLettersArray(word))*/
+                System.out.println(ill.validWordPlacement(x, y, coord, word, board));
+                System.out.println(checkListWords(coord, x, y, word, board));
+                System.out.println(ill.validCoordPlacement(x, y, coord, word, board));
+            } while (!ill.validWordPlacement(x, y, this.coord, word, this.board) || !checkListWords(coord, x, y, word, board)  ||  /*!checkBagLetters(word, getLettersArray(word))*/
                     !ill.validCoordPlacement(x, y, coord, word, board) || ill.wordExists(word, wordsWritten)
-                    || !checkListWords(coord, x, y, word, board));
-            for(int z = 0; z< newWordsFormed.size(); z++){
-                wordsWritten.add(newWordsFormed.get(z));
-            }
+                    );
+            wordsWritten.addAll(newWordsFormed);
             if (coord.equals("x")) {
                 setYCoordinate(x, y, word);
             } else
@@ -434,8 +518,7 @@ public class Board {
         return newWordsFormed;
     }
     void updateBoard(ArrayList<Map.Entry<Character,Integer>> playerBag ){
-        setNewBoard();
-        getNewBoard();
+        printBoard();
         System.out.println("Your remaining letters are " + playerBag);
         System.out.println("General bag " + tiles.getTiles());
         System.out.println(playerBag.size());
@@ -447,36 +530,58 @@ public class Board {
     void setScore(int x, int y,String coord, String word, String[][] board) {
         row = getXCoordSpecialVal();
         col = getYCoordSpecialVal();
-        int arr[][] = getFieldPoints();
+        Integer arr[][] = getFieldPoints();
+        System.out.println(score);
         setWordScore(x, y, coord, word);
+
+        System.out.println(score);
+        System.out.println(getLeftWord(x,y,board));
+        System.out.println(getRightWord(x,y,word,board));
+        System.out.println(getAboveWord(x, y, board));
+        System.out.println(getBelowWord(x,y,word,board));
         if (coord.equals("x")) {
-            setWordScore( x , y - getLeftWord(x, y, board).length(), "x", getLeftWord(x, y, board)+word+getRightWord(x, y, word, board));
-           for (int i = 0; i < word.length(); i++) {
-                setWordScore(x - getAboveWord(x , y , board).length(), y , "y", getAboveWord(x, y, board)+String.valueOf(word.charAt(i))+getBelowWord(x, y, String.valueOf(word.charAt(i)), board));
+            if(getLeftWord(x, y, board).length() != 0 && getRightWord(x, y,word, board).length() != 0) {
+                setWordScore(x, y - getLeftWord(x, y, board).length(), "x", getLeftWord(x, y, board) + word + getRightWord(x, y, word, board));
+                System.out.println(score);
             }
-        } else
-            setWordScore(x -  getAboveWord(x,y,board).length(), y, "y",getAboveWord(x, y, board)+word+getBelowWord(x, y, word, board));
-        for (int i = 0; i < word.length(); i++) {
-            setWordScore(x, y - getLeftWord(x,y,board).length(), "x",getLeftWord(x, y, board)+(word.charAt(i))+getRightWord(x, y, String.valueOf(word.charAt(i)), board));
+            for (int i = 0; i < word.length(); i++) {
+                if (getAboveWord(x, y + i, board).length() != 0 && getBelowWord(x , y + i, word, board).length() != 0) {
+                    setWordScore(x - getAboveWord(x, y + i, board).length(), y, "y", getAboveWord(x, y + i, board) + String.valueOf(word.charAt(i)) + getBelowWord(x , y + i, String.valueOf(word.charAt(i)), board));
+                    System.out.println(score);
+                }
+            }
+        } else {
+            if (getAboveWord(x, y, board).length() != 0 && getBelowWord(x, y, word, board).length() != 0) {
+                setWordScore(x - getAboveWord(x , y , board).length(), y, "y", getAboveWord(x, y, board) + word + getBelowWord(x, y, word, board));
+                System.out.println(score);
+            }
+            for (int i = 0; i < word.length(); i++) {
+                if(getLeftWord(x + i, y, board).length() != 0 && getRightWord(x + i, y,word, board).length() != 0) {
+                    setWordScore(x, y - getLeftWord(x - i, y , board).length(), "x", getLeftWord(x + i, y, board) + (word.charAt(i)) + getRightWord(x + i, y, String.valueOf(word.charAt(i)), board));
+                    System.out.println(score);
+                }
+            }
         }
         for(int r = 0 ; r<row.size(); r++){
             arr[row.get(r)][col.get(r)] = 1;
         }
         setNewFieldsScore(arr);
     }
+
+
     ArrayList<Integer> getXCoordSpecialVal(){
         return row;
     }
+
     ArrayList<Integer> getYCoordSpecialVal(){
         return col;
     }
     void setWordScore(int x, int y, String coord , String word) {
-        setFieldsScore();
-        int[][] arr = getFieldPoints();
+        Integer[][] arr = getFieldPoints();
         int dredCount = 0;
         int predCount = 0;
-        if(word.length() == 7)
-            score = score + 50;
+        //if(word.length() == 7)
+            //score = score + 50;
         if (coord.equals("x")) {
             for (k = 0; k < word.length(); k++) {
                 if (arr[x][y + k] == dred) {
@@ -484,12 +589,12 @@ public class Board {
                     dredCount++;
                     row.add(x);
                     col.add(y + k);
-                } else if (arr[x][y + k] == pred || arr[x][y + k] == start) {
+                } else if (arr[x][y + k] ==pred || arr[x][y + k] ==start) {
                     score = score + tiles.getTilesValues().get(word.charAt(k));
                     row.add(x);
                     col.add(y + k);
                     predCount++;
-                } else {
+                } else  {
                     score = score + arr[x][y + k] * tiles.getTilesValues().get(word.charAt(k));
                     if(arr[x + k][y] > 1 ) {
                         row.add(x);
@@ -511,7 +616,7 @@ public class Board {
                     dredCount++;
                     row.add(x + k);
                     col.add(y);
-                } else if (arr[x + k][y ] == pred || arr[x + k][y] == start) {
+                } else if (arr[x + k][y] == pred || arr[x + k][y] == start) {
                     row.add(x + k);
                     col.add(y);
                     score = score + tiles.getTilesValues().get(word.charAt(k));
@@ -522,7 +627,6 @@ public class Board {
                         row.add(x + k);
                         col.add(y);
                     }
-
                 }
             }
             if (dredCount > 0 && predCount > 0)
@@ -542,7 +646,7 @@ public class Board {
     }
 
     boolean isField(int i, int j) {
-        return !board[i][j].equals("- ");
+        return !board[i][j].equals("-");
     }
 
 
@@ -555,10 +659,22 @@ public class Board {
             }
     }
 
+    void printBoard() {
+        for (int i = 0; i < DIM; i++) {
+            for (int j = 0; j < DIM; j++) {
+                System.out.print(board[i][j] + " ");
+//                System.out.print("   ");
+                if (j == DIM - 1) {
+                    System.out.println();
+                }
+            }
+        }
+    }
+
     void getNewBoard() {
         System.out.println(symbol);
     }
-    void setNewFieldsScore(int[][] arr){
+    void setNewFieldsScore(Integer[][] arr){
         fieldPoints = arr;
     }
     void setFieldsScore() {
@@ -621,8 +737,8 @@ public class Board {
         fieldPoints[11][14] = pblue;
     }
 
-    int[][] getFieldPoints() {
-        return fieldPoints;
+    Integer[][] getFieldPoints() {
+        return this.fieldPoints;
     }
 
 
