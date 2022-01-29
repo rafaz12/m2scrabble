@@ -105,7 +105,7 @@ public class Board {
                 verticalWord= getAboveWord(i,j + x ,board)+word.charAt(x)+getBelowWord(i,j + x,String.valueOf(word.charAt(x)),board);
                 words.add(verticalWord);
                 validWord = false;
-                if ((ill.checkDictionary(words.get(x)) || words.get(x).length() ==1) && !ill.wordExists(words.get(x), wordsWritten)) {
+                if ((ill.checkDictionary(words.get(x)))) {
                     validWord = true;
                 }
                 else break;
@@ -133,7 +133,7 @@ public class Board {
             horizontalWord= getLeftWord(i,j,board)+word.charAt(x)+getRightWord(i,j,String.valueOf(word.charAt(x)),board);
             words.add(horizontalWord);
             validWord = false;
-            if (ill.checkDictionary(words.get(x)) || (words.get(x).length() == 1))
+            if (ill.checkDictionary(words.get(x)))
                 validWord = true;
             else break;
         }
@@ -501,7 +501,6 @@ public class Board {
             } else
                 setXCoordinate(x, y, word);
             setScore(x, y, coord, word,board);
-            int score = getScore();
             updateBagTiles(this.tiles.getPlayerBag(), word, x, y, board);
             updateBoard(this.tiles.getPlayerBag());
             num++;
@@ -519,6 +518,29 @@ public class Board {
         System.out.println(score);
     }
 
+    void setHorizontalScore(int x, int y, String word, String[][] board){
+        Integer arr[][] = getFieldPoints();
+        if((getLeftWord(x, y, board).length() != 0 || getRightWord(x, y,word, board).length() != 0) &&
+                (!newWordsFormed.contains((getLeftWord(x, y, board) + word + getRightWord(x, y, word, board))))){
+            setWordScore(x, y , "x", getLeftWord(x, y, board) + word + getRightWord(x, y, word, board));
+            newWordsFormed.add(getLeftWord(x, y, board) + word + getRightWord(x, y, word, board));
+            System.out.println(arr[x][y]);
+            System.out.println("x: "+ x);
+            System.out.println("y: "+y );
+            System.out.println(score);
+        }
+        }
+    void setVerticalScore(int x, int y, String word, String[][] board)  {
+        Integer arr[][] = getFieldPoints();
+        if ((getAboveWord(x, y, board).length() != 0 || getBelowWord(x, y, word, board).length() != 0)
+                && (!newWordsFormed.contains(getAboveWord(x, y, board) + word + getBelowWord(x, y, word, board)))
+                && dic.contains(getAboveWord(x, y, board) + word + getBelowWord(x, y, word, board))){
+            setWordScore(x , y, "y", getAboveWord(x, y, board) + word + getBelowWord(x, y, word, board));
+            newWordsFormed.add(getAboveWord(x, y, board) + word + getBelowWord(x, y, word, board));
+            System.out.println(score);
+            System.out.println(arr[x][y]);
+        }
+    }
 
     void setScore(int x, int y,String coord, String word, String[][] board) {
         row = getXCoordSpecialVal();
@@ -531,49 +553,19 @@ public class Board {
         System.out.println(score);
         System.out.println(arr[7][7]);
         if (coord.equals("x")) {
-            if((getLeftWord(x, y, board).length() != 0 || getRightWord(x, y,word, board).length() != 0) &&
-                    (!newWordsFormed.contains((getLeftWord(x, y, board) + word + getRightWord(x, y, word, board))))){
-                setWordScore(x, y , "x", getLeftWord(x, y, board) + word + getRightWord(x, y, word, board));
-                newWordsFormed.add(getLeftWord(x, y, board) + word + getRightWord(x, y, word, board));
-                System.out.println(arr[x][y]);
-                System.out.println("x: "+ x);
-                System.out.println("y: "+y );
-                System.out.println(score);
+            setHorizontalScore(x , y , word , board);
+            for (int i =0; i< word.length(); i++){
+                setVerticalScore(x ,y + i,String.valueOf(word.charAt(i)),board);
             }
-            for (int l = 0; l < word.length(); l++) {
-                System.out.println(arr[x][y+l]);
-
-                if ((getAboveWord(x, ((y +l)), board).length() != 0 || getBelowWord(x , ((y +l)), word, board).length() != 0)
-                &&(!newWordsFormed.contains(getAboveWord(x, ((y +l)), board) +word.charAt(l) + getBelowWord(x , ((y +l)), String.valueOf(word.charAt(l)), board)))){
-                    setWordScore(x , y, "y", getAboveWord(x, (y + l), board) +word.charAt(l) + getBelowWord(x , ((y +l)), String.valueOf(word.charAt(l)), board));
-                    newWordsFormed.add(getAboveWord(x, ((y +l)), board) +word.charAt(l) + getBelowWord(x , ((y +l)), String.valueOf(word.charAt(l)),board));
-                    System.out.println(score);
-
-                }
-            }
-        } else {
-            if ((getAboveWord(x, y, board).length() != 0 || getBelowWord(x, y, word, board).length() != 0)
-                && (!newWordsFormed.contains(getAboveWord(x, y, board) + word + getBelowWord(x, y, word, board)))){
-                setWordScore(x , y, "y", getAboveWord(x, y, board) + word + getBelowWord(x, y, word, board));
-                newWordsFormed.add(getAboveWord(x, y, board) + word + getBelowWord(x, y, word, board));
-                System.out.println(score);
-                System.out.println(arr[x][y]);
-
-            }
-            for (int i = 0; i < word.length(); i++) {
-                System.out.println(arr[x+i][y]);
-
-                if(((getLeftWord((x + i), y, board).length() != 0) || (getRightWord((x + i), y,word, board).length() != 0)) &&
-                (!newWordsFormed.contains(getLeftWord((x + i), y, board) + (word.charAt(i)) + getRightWord((x + i), y, String.valueOf(word.charAt(i)), board)))) {
-                    setWordScore(x, y , "x", getLeftWord((x + i), y, board) + (word.charAt(i)) + getRightWord((x + i), y, String.valueOf(word.charAt(i)), board));
-                    System.out.println(score);
-                    newWordsFormed.add(getLeftWord((x + i), y, board) + (word.charAt(i)) + getRightWord((x + i), y, String.valueOf(word.charAt(i)),board));
-
-                }
+        }
+         else{
+             setVerticalScore(x, y, word, board);
+            for (int i =0; i< word.length(); i++){
+                setHorizontalScore(x + i , y , String.valueOf(word.charAt(i)) , board);
             }
         }
         for(int r = 0 ; r<row.size(); r++){
-            arr[row.get(r)][col.get(r)] = 1;
+            arr[this.row.get(r)][this.col.get(r)] = 1;
         }
         setNewFieldsScore(arr);
     }
@@ -588,67 +580,92 @@ public class Board {
     }
     void setWordScore(int x, int y, String coord , String word) {
         Integer[][] arr = getFieldPoints();
+        HashMap<Character,Integer> tileValue = tiles.getTilesValues();
+
         int dredCount = 0;
         int predCount = 0;
+        int wordScore = 0;
         //if(word.length() == 7)
             //score = score + 50;
         if (coord.equals("x")) {
             for (k = 0; k < word.length(); k++) {
-                if (arr[x][y + k] == dred) {
-                    this.score = score + tiles.getTilesValues().get(word.charAt(k));
-                    dredCount++;
-                    row.add(x);
-                    col.add(y + k);
-                } else if (arr[x][y + k] ==pred || arr[x][y + k] ==start) {
-                    this.score = score + tiles.getTilesValues().get(word.charAt(k));
-                    row.add(x);
-                    col.add(y + k);
-                    predCount++;
-                } else  {
-                    this.score = score + arr[x][y + k] * tiles.getTilesValues().get(word.charAt(k));
-                    if(arr[x][y + k] > 1 ) {
+                if(y + k < 15) {
+                    if (arr[x][y + k] == dred) {
+                        wordScore = wordScore + tileValue.get(word.charAt(k));
+                        dredCount++;
                         row.add(x);
                         col.add(y + k);
-                    }
-                }
-            }
-            if (dredCount > 0 && predCount > 0)
-                this.score = score * predCount * pred * dredCount * dred;
-            else if (dredCount > 0 && predCount == 0)
-                this.score = score * dredCount * dred;
-
-            else if (dredCount == 0 && predCount > 0)
-                this.score = score * predCount * pred;
-        } else {
-            if(coord.equals("y")) {
-                for (k = 0; k < word.length(); k++) {
-                    if (arr[x + k][y] == dred) {
-                        this.score = score + tiles.getTilesValues().get(word.charAt(k));
-                        dredCount++;
-                        row.add(x + k);
-                        col.add(y);
-                    } else if (arr[x + k][y] == pred || arr[x + k][y] == start) {
-                        row.add(x + k);
-                        col.add(y);
-                        this.score = score + tiles.getTilesValues().get(word.charAt(k));
+                    } else if (arr[x][y + k] == pred || arr[x][y + k] == start) {
+                        wordScore = wordScore + tileValue.get(word.charAt(k));
+                        row.add(x);
+                        col.add(y + k);
                         predCount++;
                     } else {
-                        this.score = score + arr[x + k][y] * tiles.getTilesValues().get(word.charAt(k));
-                        if (arr[x + k][y] > 1) {
-                            row.add(x + k);
-                            col.add(y);
+                        wordScore = wordScore + arr[x][(y + k)] * tileValue.get(word.charAt(k));
+                        if (arr[x][y + k] > 1) {
+                            row.add(x);
+                            col.add(y + k);
                         }
                     }
                 }
             }
-            if (dredCount > 0 && predCount > 0)
-                this.score = score * predCount * pred * dredCount * dred;
-            else if (dredCount > 0 && predCount == 0)
-                this.score = score * dredCount * dred;
+            if (dredCount > 0 && predCount > 0) {
+                this.score = score + wordScore * predCount * pred * dredCount * dred;
+            }
+            else if (dredCount > 0 && predCount == 0) {
+                this.score = score + wordScore * dredCount * dred;
 
-            else if (dredCount == 0 && predCount > 0)
-                this.score = score * predCount * pred;
+            }
+            else if (dredCount == 0 && predCount > 0) {
+                this.score = score + wordScore * predCount * pred;
+            }
+            else
+                this.score = score + wordScore;
+        } else {
+            if(coord.equals("y")) {
+                for (k = 0; k < word.length(); k++) {
+                    if(x + k < 15) {
+                        if (arr[x + k][y] == dred) {
+                            wordScore = wordScore + tileValue.get(word.charAt(k));
+                            System.out.println("Score is : " + score);
+
+                            dredCount++;
+                            row.add(x + k);
+                            col.add(y);
+                        } else if (arr[x + k][y] == pred || arr[x + k][y] == start) {
+                            row.add(x + k);
+                            col.add(y);
+                            wordScore = wordScore + tileValue.get(word.charAt(k));
+                            System.out.println("Score is : " + score);
+                            predCount++;
+                        } else {
+                            wordScore = wordScore + arr[x + k][y] * tileValue.get(word.charAt(k));
+                            System.out.println("Score is : " + score);
+                            if (arr[x + k][y] > 1) {
+                                row.add(x + k);
+                                col.add(y);
+                            }
+                        }
+                    }
+                }
+            }
+            if (dredCount > 0 && predCount > 0) {
+                this.score = score + wordScore * predCount * pred * dredCount * dred;
+            }
+            else if (dredCount > 0 && predCount == 0) {
+                this.score = score + wordScore * dredCount * dred;
+
+            }
+            else if (dredCount == 0 && predCount > 0) {
+                this.score = score + wordScore * predCount * pred;
+            }
+            else
+                this.score = score + wordScore;
         }
+
+
+        System.out.println("Score is : "+this.score);
+        System.out.println("Score of "+word+"is : "+wordScore);
 
     }
 
