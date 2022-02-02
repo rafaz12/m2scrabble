@@ -92,6 +92,7 @@ public class Player {
                 }
 
             } while (!letterExist || !tilesExist);
+            System.out.println();
         }
          }
 
