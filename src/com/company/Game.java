@@ -4,13 +4,15 @@ import javax.imageio.stream.ImageInputStream;
 import java.util.Scanner;
 
 public class Game {
-    Player p1, p2;
-    Board board;
-    Tiles t;
+    String name1,name2;
+    public Player p1, p2;
+    public Board board;
+    public Tiles t;
     int turn = 0;
 
-    public Game() {
-
+    public Game(String name1, String name2) {
+        this.name1 = name1;
+        this.name2 = name2;
     }
 
     public void printMenu() {
@@ -24,24 +26,13 @@ public class Game {
                 + "Enjoy!");
     }
 
-    void setUpGame() {
-        Scanner sc = new Scanner(System.in);
-        String name1 , name2;
+    public void setUpGame(String name1, String name2) {
         t = new Tiles();
         board = new Board();
         board.setFieldsScore();
         Tiles t = new Tiles();
         t.setTiles();
-        System.out.println("Please enter your name: ");
-        name1 = sc.next();
         p1 = new Player(name1, board);
-        System.out.println("Please enter your name");
-        do{
-           name2 = sc.next();
-           if(name2.equals(name1))
-               System.out.println("Please enter different name than "+p1.getPlayerName());
-        }while(name2.equals(name1));
-
         p2 = new Player(name2, board);
         p1.setPlayerBag(t.generalTiles);
         p2.setPlayerBag(t.generalTiles);
@@ -57,8 +48,10 @@ public class Game {
             return true;
         else return false;
     }
-
-    void gamePlay() {
+    public void gameBoard(){
+        board.printBoard();
+    }
+    public void gamePlay() {
         do {
             Scanner sc = new Scanner(System.in);
             System.out.println("Player " + p1.getPlayerName() + "'s turn ");
@@ -126,13 +119,6 @@ public class Game {
 
 
     public static void main(String[] args) {
-        Game g = new Game();
-        g.printMenu();
-        g.setUpGame();
-        g.gamePlay();
-        g.setFinalScore();
-        System.out.println(g.announceWinner());
-        g.endGame();
     }
 
 

@@ -97,10 +97,10 @@ public class Player {
 
 
     ArrayList<Map.Entry<Character, Integer>> getPlayerBag() {
-        if (this.playerBag.contains(Map.entry(' ', 0))) {
-            int temp = playerBag.indexOf(Map.entry(' ', 0));
+        if (this.playerBag.contains(Map.entry('!', 0))) {
+            int temp = playerBag.indexOf(Map.entry('!', 0));
             this.playerBag.remove(temp);
-            this.playerBag.add(Map.entry(' ', 0));
+            this.playerBag.add(Map.entry('!', 0));
         }
         return this.playerBag;
     }
@@ -255,7 +255,7 @@ public class Player {
                     this.playerBag.add(t.generalTiles.get(m));
                     this.t.generalTiles.remove(t.generalTiles.get(m));
                     break;
-                } else if (playerBag.get(m).getKey().equals(' ') || ill.checkEmpty(i,j, b.getBoardData())) {
+                } else if (playerBag.get(m).getKey().equals('!') || ill.checkEmpty(i,j, b.getBoardData())) {
                     this.playerBag.remove(playerBag.get(m));
                     Collections.shuffle(t.generalTiles);
                     this.playerBag.add(t.generalTiles.get(m));
@@ -491,14 +491,14 @@ public class Player {
                 }
     }
     boolean checkBlankTile(ArrayList<Map.Entry<Character, Integer>> playerBag){
-        if(this.playerBag.contains(' '))
+        if(this.playerBag.contains('!'))
             return true;
         return false;
     }
     int getBlankTiles(ArrayList<Map.Entry<Character, Integer>> playerBag){
         int c = 0;
         for( int i = 0; i< this.playerBag.size(); i++){
-            if(this.playerBag.get(i).getKey().equals(' '))
+            if(this.playerBag.get(i).getKey().equals('!'))
                 c++;
         }
         return c;

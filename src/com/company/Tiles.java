@@ -36,7 +36,7 @@ public class Tiles {
         tiles.put('X',8);
         tiles.put('Y',4);
         tiles.put('Z',10);
-        tiles.put(' ',0);
+        tiles.put('!',0);
 
         quantity = new int[27];
         quantity[0] = 9;
