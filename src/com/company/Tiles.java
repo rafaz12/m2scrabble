@@ -4,10 +4,10 @@ import java.lang.reflect.Array;
 import java.util.*;
 
 public class Tiles {
-    private HashMap<Character,Integer> tiles ;
-    private int[] quantity ;
-    private ArrayList<Map.Entry<Character, Integer>> generalTiles;
-    private ArrayList<Map.Entry<Character, Integer>> playerBag;
+    public HashMap<Character,Integer> tiles ;
+    public int[] quantity ;
+    public ArrayList<Map.Entry<Character, Integer>> generalTiles;
+    public ArrayList<Map.Entry<Character, Integer>> playerBag = new ArrayList<>();
     public Tiles(){
         tiles = new HashMap<Character,Integer>();
         tiles.put('A',1);
@@ -74,24 +74,15 @@ public class Tiles {
         return this.tiles;
     }
 
-    void setPlayerBag(){
-        playerBag = new ArrayList<>();
-        for ( int i=0; i < 7; i++ ) {
-            playerBag.add(generalTiles.get(i));
-            generalTiles.remove(generalTiles.get(i));
-        }
-
-
+    boolean validSwap(int x, ArrayList<Map.Entry<Character, Integer>> generalBag){
+        return x <= generalBag.size();
     }
-    ArrayList<Map.Entry<Character, Integer>> getPlayerBag() {
-        if(playerBag.contains(Map.entry(' ',0))){
-            int temp = playerBag.indexOf(Map.entry(' ',0));
-            playerBag.remove(temp);
-            playerBag.add(Map.entry(' ',0));
-
-        }
-        return this.playerBag;
+    int tilesGeneralBag(){
+        return this.generalTiles.size();
     }
+
+
+
 
 
 
@@ -112,7 +103,7 @@ public class Tiles {
 
     }
     ArrayList<Map.Entry<Character, Integer>> getTiles(){
-        return generalTiles;
+        return this.generalTiles;
     }
 
     public static void main(String[] args) {

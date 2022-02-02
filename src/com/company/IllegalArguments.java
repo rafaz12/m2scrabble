@@ -20,6 +20,9 @@ public class IllegalArguments {
             return true;
         return false;
     }
+    boolean isFirstTurn(){
+        return true;
+    }
 
     boolean checkSurrounding(int i, int j, String[][] board) {
         return (checkNorth(i, j ,board) || checkEast(i, j ,board)) || checkSouth(i, j , board) || checkWest(i, j, board);
@@ -88,6 +91,7 @@ public class IllegalArguments {
                       }
                   return sameLetter;
           }
+
         boolean validWordPlacement( int i , int j , String coord,String word , String [][] board) {
             boolean valid = false;
             if(coord.equals("x")){
