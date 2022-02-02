@@ -92,7 +92,6 @@ public class Player {
                 }
 
             } while (!letterExist || !tilesExist);
-            System.out.println();
         }
          }
 
@@ -428,10 +427,11 @@ public class Player {
 
     void enterFirstWord() {
         String k, l;
-        int x, y, w , e, c = 0;
+        int x, y, w , e, c;
         tiles = new Tiles();
         tiles.setTiles();
         do {
+            c = 0;
             coord =  getWordDirection();
             Scanner sc = new Scanner(System.in);
             System.out.println("Please select coordinates x,y");
@@ -461,7 +461,7 @@ public class Player {
                 }
             }
             if( c !=1 )
-                System.out.println("There should be one letter on 7,7.");
+                System.out.println("Invalid word.");
         }while (!ill.validCoordinate(x + word.length() - 1, y)
                 || !ill.validCoordinate(x, y + word.length() - 1) || !checkBagLetters(word,getLettersArray(word),playerBag)
                 || word.length() < 2) ;
@@ -509,7 +509,7 @@ public class Player {
         boolean letterExist = false;
         for (int i = 0; i < letters.length(); i++) {
             if(this.t.generalTiles.contains(lettersArray.get(i)))
-            if (this.playerBag.contains(lettersArray.get(i)) && !checkBlankTile(this.playerBag())) {
+            if (this.playerBag.contains(lettersArray.get(i)) || checkBlankTile(this.playerBag())) {
                 break;
             } else {
                 getBlankTiles(this.playerBag);

@@ -25,13 +25,24 @@ public class Game {
     }
 
     void setUpGame() {
+        Scanner sc = new Scanner(System.in);
+        String name1 , name2;
         t = new Tiles();
         board = new Board();
         board.setFieldsScore();
         Tiles t = new Tiles();
         t.setTiles();
-        p1 = new Player("John", board);
-        p2 = new Player("Jim", board);
+        System.out.println("Please enter your name: ");
+        name1 = sc.next();
+        p1 = new Player(name1, board);
+        System.out.println("Please enter your name");
+        do{
+           name2 = sc.next();
+           if(name2.equals(name1))
+               System.out.println("Please enter different name than "+p1.getPlayerName());
+        }while(name2.equals(name1));
+
+        p2 = new Player(name2, board);
         p1.setPlayerBag(t.generalTiles);
         p2.setPlayerBag(t.generalTiles);
 
@@ -59,7 +70,10 @@ public class Game {
                 cmd = sc.next();
                 p1.makeMove(cmd);
             } while (!p1.checkPlayerCommand(cmd));
-
+            if (p1.giveUp || p1.playerBag.size() == 0) {
+                isWinner(p1, p2);
+                break;
+            }
             System.out.println("Player " + p2.getPlayerName() + "'s turn");
             board.printBoard();
             do {
@@ -69,21 +83,25 @@ public class Game {
                 cmd = sc.next();
                 p2.makeMove(cmd);
             } while (!p2.checkPlayerCommand(cmd));
+            if (p2.giveUp  || p2.playerBag.size() == 0){
+                isWinner(p1, p2);
+                break;
+            }
         } while (!isWinner(p1, p2));
 
     }
 
     String announceWinner() {
-        if (p1.giveUp || p2.score > p1.score) {
+        if (p1.giveUp || (p2.score > p1.score)) {
             return "The winner is " + p2.getPlayerName() + "with " + p2.getPlayerScore();
-        } else if (p2.giveUp || p1.score > p2.score) {
+        } else if (p2.giveUp || (p1.score > p2.score)) {
             return "The winner is " + p1.getPlayerName() + "with " + p1.getPlayerScore();
         } else {
             return "DRAW";
         }
     }
 
-    void setFinalScore(Player p1, Player p2) {
+    void setFinalScore() {
         int bagScore1 = 0, bagScore2 = 0;
         for (int i = 0; i < p1.getPlayerBag().size(); i++) {
             bagScore1 = bagScore1 + p1.getPlayerBag().get(i).getValue();
@@ -102,8 +120,8 @@ public class Game {
         }
     }
     String endGame(){
-        setFinalScore(p1 , p2);
-        return announceWinner();
+        setFinalScore();
+        return " "+announceWinner();
     }
 
 
@@ -112,6 +130,8 @@ public class Game {
         g.printMenu();
         g.setUpGame();
         g.gamePlay();
+        g.setFinalScore();
+        System.out.println(g.announceWinner());
         g.endGame();
     }
 
