@@ -84,16 +84,17 @@ public class Board {
             }
     }
 
-    void printBoard() {
+    String printBoard() {
+        String printBoard = "";
         for (int i = 0; i < DIM; i++) {
             for (int j = 0; j < DIM; j++) {
-                System.out.print(board[i][j] + " ");
-                System.out.print("   ");
+                printBoard = printBoard + board[i][j] + "   ";
                 if (j == DIM - 1) {
-                    System.out.println();
+                    printBoard = printBoard + "\r\n";
                 }
             }
         }
+        return printBoard;
     }
 
     void getNewBoard() {
@@ -168,5 +169,6 @@ public class Board {
 
 
     public static void main(String[] args) {
+        Board b = new Board();
     }
 }

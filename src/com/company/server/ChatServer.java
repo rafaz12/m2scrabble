@@ -18,8 +18,8 @@ public class ChatServer {
     public Set<String> userNames = new HashSet<>();
     private Set<UserThread> userThreads = new HashSet<>();
     private ArrayList<String> userNamesArray = new ArrayList<>();
-    public ServerSocket serverSocket;
     private ArrayList<UserThread> userThreadsArray = new ArrayList<>();
+    public boolean isStarted;
 
     public ChatServer(int port) {
         this.port = port;
@@ -100,6 +100,9 @@ public class ChatServer {
                     onlineGame = new Game(userNames.toArray()[0].toString(),userNames.toArray()[1].toString());
                     onlineGame.setUpGame(userNames.toArray()[0].toString(), userNames.toArray()[1].toString());
                     message = "The game between "+userNames.toArray()[0]+" and "+userNames.toArray()[1]+" begins";
+                    isStarted = true;
+                    broadcast(message , null);
+                    message = onlineGame.gameBoard();
                     broadcast(message , null);
                     break;
                 }

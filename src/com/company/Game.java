@@ -48,8 +48,8 @@ public class Game {
             return true;
         else return false;
     }
-    public void gameBoard(){
-        board.printBoard();
+    public String gameBoard(){
+        return board.printBoard();
     }
     public void gamePlay() {
         do {
