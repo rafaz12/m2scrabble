@@ -61,7 +61,6 @@ public class Game {
                 System.out.println(p1.getPlayerBag());
                 p1.printOptions();
                 cmd = sc.next();
-                p1.makeMove(cmd);
             } while (!p1.checkPlayerCommand(cmd));
             if (p1.giveUp || p1.playerBag.size() == 0) {
                 isWinner(p1, p2);
@@ -74,7 +73,6 @@ public class Game {
                 System.out.println("Your score is: " + p2.getScore());
                 p2.printOptions();
                 cmd = sc.next();
-                p2.makeMove(cmd);
             } while (!p2.checkPlayerCommand(cmd));
             if (p2.giveUp  || p2.playerBag.size() == 0){
                 isWinner(p1, p2);

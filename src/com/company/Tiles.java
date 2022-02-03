@@ -4,39 +4,39 @@ import java.lang.reflect.Array;
 import java.util.*;
 
 public class Tiles {
-    public HashMap<Character,Integer> tiles ;
+    public HashMap<Character,Integer>tl ;
     public int[] quantity ;
     public ArrayList<Map.Entry<Character, Integer>> generalTiles;
     public ArrayList<Map.Entry<Character, Integer>> playerBag = new ArrayList<>();
     public Tiles(){
-        tiles = new HashMap<Character,Integer>();
-        tiles.put('A',1);
-        tiles.put('B',3);
-        tiles.put('C',3);
-        tiles.put('D',2);
-        tiles.put('E',1);
-        tiles.put('F',4);
-        tiles.put('G',2);
-        tiles.put('H',4);
-        tiles.put('I',1);
-        tiles.put('J',8);
-        tiles.put('K',5);
-        tiles.put('L',1);
-        tiles.put('M',3);
-        tiles.put('N',1);
-        tiles.put('O',1);
-        tiles.put('P',3);
-        tiles.put('Q',10);
-        tiles.put('R',1);
-        tiles.put('S',1);
-        tiles.put('T',1);
-        tiles.put('U',1);
-        tiles.put('V',4);
-        tiles.put('W',4);
-        tiles.put('X',8);
-        tiles.put('Y',4);
-        tiles.put('Z',10);
-        tiles.put('!',0);
+        this.tl = new HashMap<Character,Integer>();
+        this.tl.put('A',1);
+        this.tl.put('B',3);
+        this.tl.put('C',3);
+        this.tl.put('D',2);
+        this.tl.put('E',1);
+        this.tl.put('F',4);
+        this.tl.put('G',2);
+        this.tl.put('H',4);
+        this.tl.put('I',1);
+        this.tl.put('J',8);
+        this.tl.put('K',5);
+        this.tl.put('L',1);
+        this.tl.put('M',3);
+        this.tl.put('N',1);
+        this.tl.put('O',1);
+        this.tl.put('P',3);
+        this.tl.put('Q',10);
+        this.tl.put('R',1);
+        this.tl.put('S',1);
+        this.tl.put('T',1);
+        this.tl.put('U',1);
+        this.tl.put('V',4);
+        this.tl.put('W',4);
+        this.tl.put('X',8);
+        this.tl.put('Y',4);
+        this.tl.put('Z',10);
+        this.tl.put('!',0);
 
         quantity = new int[27];
         quantity[0] = 9;
@@ -70,8 +70,8 @@ public class Tiles {
 
     }
 
-    HashMap<Character, Integer> getTilesValues(){
-        return this.tiles;
+    public HashMap<Character, Integer> getTilesValues(){
+        return this.tl;
     }
 
     boolean validSwap(int x, ArrayList<Map.Entry<Character, Integer>> generalBag){
@@ -89,7 +89,7 @@ public class Tiles {
     void setTiles(){
         ArrayList<Map.Entry<Character, Integer>> setTiles = new ArrayList<>();
         generalTiles = new ArrayList<>();
-        Set<Map.Entry<Character,Integer>> set = tiles.entrySet();
+        Set<Map.Entry<Character,Integer>> set = this.tl.entrySet();
         for (Map.Entry<Character, Integer> t : set)
             setTiles.add(t);
 
@@ -110,5 +110,7 @@ public class Tiles {
         Tiles t = new Tiles();
         t.setTiles();
         t.getTiles();
+        System.out.println(t.getTilesValues());
+
     }
 }

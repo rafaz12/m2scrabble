@@ -15,7 +15,7 @@ public class IllegalArguments {
             return false;
         }
     }
-    boolean validCoordinate(int x, int y){
+    public boolean validCoordinate(int x, int y){
         if(x < 15 && x >= 0 && y < 15 && y >= 0)
             return true;
         return false;

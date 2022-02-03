@@ -19,6 +19,7 @@ public class ChatServer {
     private Set<UserThread> userThreads = new HashSet<>();
     private ArrayList<String> userNamesArray = new ArrayList<>();
     private ArrayList<UserThread> userThreadsArray = new ArrayList<>();
+    private ArrayList<Integer> userTurns = new ArrayList<>();
     public boolean isStarted;
 
     public ChatServer(int port) {
@@ -37,6 +38,7 @@ public class ChatServer {
                 System.out.println("New user connected");
 
                 UserThread newUser = new UserThread(socket, this);
+                userThreadsArray.add(newUser);
                 userNamesArray.add(newUser.userName);
                 userThreads.add(newUser);
                 newUser.start();
@@ -79,24 +81,34 @@ public class ChatServer {
     void handle(String message, UserThread user) {
         String [] digest;
         digest = message.split("~");
+        System.out.println(digest.length);
         switch (digest[1]){
             case "SENDCHAT":
-                message = user.userName+" : "+ digest[2];
+                message = user.userName + " : " + digest[2];
                 System.out.println("Command was issued: " + digest[2]);
                 broadcast(message, user);
                 user.sendMessage(message);
                 break;
             case "REQUESTGAME":
+                if(user.request){
+                    message = "You already requested a game. ";
+                    user.sendMessage(message);
+                    break;
+                }
                 System.out.println(user.userName+ " requested a game.");
                 req++;
                 if(req == 1){
                     message = "Waiting for another player. . . ";
+                    user.numero = 1;
                     user.turn = 1;
+                    userTurns.add(user.turn);
                     user.sendMessage(message);
                     break;
                 }
                 if(req == 2) {
+                    user.numero = 2;
                     user.turn = 2;
+                    userTurns.add(user.turn);
                     onlineGame = new Game(userNames.toArray()[0].toString(),userNames.toArray()[1].toString());
                     onlineGame.setUpGame(userNames.toArray()[0].toString(), userNames.toArray()[1].toString());
                     message = "The game between "+userNames.toArray()[0]+" and "+userNames.toArray()[1]+" begins";
@@ -104,7 +116,163 @@ public class ChatServer {
                     broadcast(message , null);
                     message = onlineGame.gameBoard();
                     broadcast(message , null);
+                    message = "Your tiles are : "+onlineGame.p1.getPlayerBag().toString()+"\r\nYour score is "+onlineGame.p1.score;
+                    broadcast(message , user);
+                    message = "Your tiles are : "+onlineGame.p2.getPlayerBag().toString()+"\r\nYour score is "+onlineGame.p2.score;;
+                    user.sendMessage(message);
+                    if(userThreadsArray.get(0).turn == 1 )
+                        message = "It is "+userThreadsArray.get(0).userName+" turn";
+                    else
+                        message = "It is "+userThreadsArray.get(1).userName+" turn";
+                    broadcast(message, null);
                     break;
+                }
+            case "MAKEMOVE":
+                if (user.userTurn() != 1) {
+                user.sendMessage("It is not your turn.");
+                break;
+            }
+                switch(digest[2]) {
+                    case "SWAP":
+                        if (user.numero == 1) {
+                            onlineGame.p1.makeMove("SW", digest[3], null,null,null,null);
+                            if (!onlineGame.p1.letterExist || !onlineGame.p1.tilesExist) {
+                                user.sendMessage("You don't have such tiles in your bag.\r\nMake another move");
+                                break;
+                            } else {
+                                message = "Your tiles are now" + onlineGame.p1.getPlayerBag() + "\r\nYour score is: " + onlineGame.p1.score;
+                                for (int i = 0; i < userThreadsArray.size(); i++) {
+                                    if (userThreadsArray.get(i) == user) {
+                                        userThreadsArray.get(i).turn = 2;
+                                    } else userThreadsArray.get(i).turn = 1;
+                                }
+                                user.sendMessage(message);
+                                if (userThreadsArray.get(0).turn == 1)
+                                    message = "It is " + userThreadsArray.get(0).userName + " turn";
+                                else
+                                    message = "It is " + userThreadsArray.get(1).userName + " turn";
+                                broadcast(message, null);
+                                break;
+                            }
+                        }
+                        if (user.numero == 2) {
+                            onlineGame.p2.makeMove("SW", digest[3], null , null , null, null );
+                            if (!onlineGame.p2.letterExist || !onlineGame.p2.tilesExist) {
+                                user.sendMessage("You don't have such tiles in your bag.\r\n" + "Place another move");
+                                break;
+                            } else {
+                                message = "Your tiles are now" + onlineGame.p2.getPlayerBag();
+                                user.sendMessage(message);
+                                for (int i = 0; i < userThreadsArray.size(); i++) {
+                                    if (userThreadsArray.get(i) == user) {
+                                        userThreadsArray.get(i).turn = 2;
+                                    } else userThreadsArray.get(i).turn = 1;
+                                }
+                                if (userThreadsArray.get(0).turn == 1)
+                                    message = "It is " + userThreadsArray.get(0).userName + " turn";
+                                else
+                                    message = "It is " + userThreadsArray.get(1).userName + " turn";
+                                broadcast(message, null);
+                                break;
+                            }
+                        }
+                    case "WORD":
+                        if (user.numero == 1) {
+                            if(onlineGame.board.turn == 0 )
+                                onlineGame.p1.enterFirstWord(digest[3], digest[4], digest[5], digest[6]);
+                            if(!digest[3].equals("x") && !digest[3].equals("y")) {
+                                message = "Wrong coordinate for expansion. It must have been either 'x' or 'y'\r\nTry another move";
+                            user.sendMessage(message);
+                            break;
+                            }
+                            else if (!onlineGame.p1.ill.validCoordinate(Integer.parseInt(digest[4]),Integer.parseInt(digest[5]))) {
+                                message = "Coordinates shall be between '0-14'\r\ntry another move";
+                                user.sendMessage(message);
+                                break;
+                            }
+                            else if(!onlineGame.p1.validPlacement){
+                                message = "Invalid move";
+                                for (int i = 0; i < userThreadsArray.size(); i++) {
+                                    if (userThreadsArray.get(i) == user) {
+                                        userThreadsArray.get(i).turn = 2;
+                                    } else userThreadsArray.get(i).turn = 1;
+                                }
+                                user.sendMessage(message);
+                                if (userThreadsArray.get(0).turn == 1)
+                                    message = "It is " + userThreadsArray.get(0).userName + " turn";
+                                else
+                                    message = "It is " + userThreadsArray.get(1).userName + " turn";
+                                broadcast(message, null);
+                                break;
+                            }
+                            else{
+                                message = onlineGame.gameBoard();
+                                broadcast(message, null);
+                                message = "Your tiles are : "+onlineGame.p2.getPlayerBag().toString()+"\r\nYour score is "+onlineGame.p2.score;
+                                broadcast(message , user);
+                                message = "Your tiles are : "+onlineGame.p1.getPlayerBag().toString()+"\r\nYour score is "+onlineGame.p1.score;;
+                                user.sendMessage(message);
+                                for (int i = 0; i < userThreadsArray.size(); i++) {
+                                    if (userThreadsArray.get(i) == user) {
+                                        userThreadsArray.get(i).turn = 2;
+                                    } else userThreadsArray.get(i).turn = 1;
+                                }
+                                if (userThreadsArray.get(0).turn == 1)
+                                    message = "It is " + userThreadsArray.get(0).userName + " turn";
+                                else
+                                    message = "It is " + userThreadsArray.get(1).userName + " turn";
+                                broadcast(message, null);
+                                break;
+                            }
+                        }
+                        else if (user.numero == 2){
+                            if(onlineGame.board.turn == 0)
+                                onlineGame.p2.enterFirstWord(digest[3], digest[4], digest[5], digest[6]);
+                            if(!digest[3].equals("x") && !digest[3].equals("y")) {
+                                message = "Wrong coordinate for expansion. It must have been either 'x' or 'y'\r\nTry another move";
+                                user.sendMessage(message);
+                                break;
+                            }
+                            else if (!onlineGame.p2.ill.validCoordinate(Integer.parseInt(digest[4]),Integer.parseInt(digest[5]))) {
+                                message = "Coordinates shall be between '0-14'\r\ntry another move";
+                                user.sendMessage(message);
+                                break;
+                            }
+                            else if(!onlineGame.p2.validPlacement){
+                                message = "Invalid move";
+                                for (int i = 0; i < userThreadsArray.size(); i++) {
+                                    if (userThreadsArray.get(i) == user) {
+                                        userThreadsArray.get(i).turn = 2;
+                                    } else userThreadsArray.get(i).turn = 1;
+                                }
+                                user.sendMessage(message);
+                                if (userThreadsArray.get(0).turn == 1)
+                                    message = "It is " + userThreadsArray.get(0).userName + " turn";
+                                else
+                                    message = "It is " + userThreadsArray.get(1).userName + " turn";
+                                broadcast(message, null);
+                                break;
+                            }
+                            else{
+                                message = onlineGame.gameBoard();
+                                broadcast(message, null);
+                                message = "Your tiles are : "+onlineGame.p2.getPlayerBag().toString()+"\r\nYour score is "+onlineGame.p2.score;
+                                broadcast(message , user);
+                                message = "Your tiles are : "+onlineGame.p1.getPlayerBag().toString()+"\r\nYour score is "+onlineGame.p1.score;;
+                                user.sendMessage(message);
+                                for (int i = 0; i < userThreadsArray.size(); i++) {
+                                    if (userThreadsArray.get(i) == user) {
+                                        userThreadsArray.get(i).turn = 2;
+                                    } else userThreadsArray.get(i).turn = 1;
+                                }
+                                if (userThreadsArray.get(0).turn == 1)
+                                    message = "It is " + userThreadsArray.get(0).userName + " turn";
+                                else
+                                    message = "It is " + userThreadsArray.get(1).userName + " turn";
+                                broadcast(message, null);
+                                break;
+                        }
+                        }
                 }
                 }
         }

@@ -49,7 +49,7 @@ public class Board {
         return tiles.getTiles().size();
     }
 
-    String [][] getBoardData(){
+    public String [][] getBoardData(){
         return board;
     }
 

@@ -10,7 +10,8 @@ public class UserThread extends Thread {
     public BufferedReader reader;
     public BufferedReader serverReader;
     public String  userName = null;
-    public int turn;
+    public boolean request = false;
+    public int turn, numero;
 
     public UserThread(Socket socket, ChatServer server) throws IOException {
         this.socket = socket;
