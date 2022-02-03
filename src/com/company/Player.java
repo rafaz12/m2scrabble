@@ -67,7 +67,7 @@ public class Player {
             checkGameOver(this.playerBag);
         }
         else if (cmd.equals("M")){
-            enterWord();
+
             checkGameOver(this.playerBag);
         }
         else if(cmd.equals("SK")){
@@ -448,21 +448,27 @@ public class Player {
         e = y;
         if (coord.equals("x")) {
             for (int i = 0; i < word.length(); i++) {
-                if (w == 7 && e == 7)
-                    c++;
-                w++;
+                if (w == 7 && e == 7) {
+                    c = 1;
+                    break;
+                }
+                e++;
             }
         } else {
             for (int i = 0; i < word.length(); i++) {
-                if (w == 7 && e == 7)
-                    c++;
-                e++;
+                if (w == 7 && e == 7) {
+                    c = 1;
+                    break;
+                }
+                w++;
 
             }
         }
-        if (dic.contains(word) && c == 1 && checkBagLetters(word,getLettersArray(word),playerBag)) {
+        if (dic.contains(word) && c == 1 && checkBagLetters(word,getLettersArray(word),playerBag) &&
+                ( coord.equalsIgnoreCase("x") || coord.equalsIgnoreCase("y"))) {
             validPlacement = true;
             b.turn++;
+            coord = coord.toLowerCase();
             if (coord.equals("x")) {
                 b.setYCoordinate(x, y, word);
             } else
@@ -557,23 +563,14 @@ public class Player {
         return trueCoord;
     }
 
-    void enterWord() {
-        Scanner sc = new Scanner(System.in);
-        String k = "", l = "";
-        String word = "";
+    public void enterWord(String coord, String k, String l, String word) {
+        validPlacement = false;
         int x, y;
-        getWordDirection();
 
-        System.out.println("Please select coordinates x,y");
-        do {
-            k = sc.next();
-            l = sc.next();
-            if(!validateCoordinate(k, l))
-                System.out.println("Please enter coordinates between 0 and 14");
-        } while (!validateCoordinate(k, l));
+
         x = parseInt(k);
         y = parseInt(l);
-        if (coord.equals("x"))
+      /*  if (coord.equals("x"))
             do {
                 word = getWord().toUpperCase();
                 if (!ill.validCoordinate(x, word.length() - 1 + y))
@@ -584,9 +581,11 @@ public class Player {
             if (!ill.validCoordinate(x + word.length() - 1, y))
                 System.out.println("Enter another word inside bounds");
         } while (!ill.validCoordinate(x + word.length() - 1, y));
+       */
         if (notAllConditionsMet(x, y , word , coord )) {
             System.out.println("Invalid move");
         } else {
+            validPlacement = true;
             b.wordsWritten.addAll(b.newWordsFormed);
             if (coord.equals("x")) {
                 b.setYCoordinate(x, y, word);
@@ -594,7 +593,6 @@ public class Player {
                 b.setXCoordinate(x, y, word);
             setScore(x, y, coord, word, b.getBoardData(), b);
             updateBagTiles(this.playerBag, word, x, y, b.getBoardData());
-           b.updateBoard();
         }
     }
     public boolean notAllConditionsMet(int x, int y , String word , String coord ){

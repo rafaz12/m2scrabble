@@ -100,12 +100,14 @@ public class ChatServer {
                 if(req == 1){
                     message = "Waiting for another player. . . ";
                     user.numero = 1;
+                    user.request = true;
                     user.turn = 1;
                     userTurns.add(user.turn);
                     user.sendMessage(message);
                     break;
                 }
                 if(req == 2) {
+                    user.request = true;
                     user.numero = 2;
                     user.turn = 2;
                     userTurns.add(user.turn);
@@ -133,6 +135,26 @@ public class ChatServer {
                 break;
             }
                 switch(digest[2]) {
+                    case "OVER":
+
+                        user.sendMessage("Game over, winner is");
+
+                    case "SKIP":
+                        message = "Turn skipped. ";
+                        user.sendMessage(message);
+                        for (int i = 0; i < userThreadsArray.size(); i++) {
+                            if (userThreadsArray.get(i) == user) {
+                                userThreadsArray.get(i).turn = 2;
+                            } else userThreadsArray.get(i).turn = 1;
+                        }
+                        user.sendMessage(message);
+                        if (userThreadsArray.get(0).turn == 1)
+                            message = "It is " + userThreadsArray.get(0).userName + " turn";
+                        else
+                            message = "It is " + userThreadsArray.get(1).userName + " turn";
+                        broadcast(message, null);
+
+
                     case "SWAP":
                         if (user.numero == 1) {
                             onlineGame.p1.makeMove("SW", digest[3], null,null,null,null);
@@ -180,7 +202,9 @@ public class ChatServer {
                         if (user.numero == 1) {
                             if(onlineGame.board.turn == 0 )
                                 onlineGame.p1.enterFirstWord(digest[3], digest[4], digest[5], digest[6]);
-                            if(!digest[3].equals("x") && !digest[3].equals("y")) {
+                            else
+                                onlineGame.p1.enterWord(digest[3], digest[4], digest[5], digest[6]);
+                            if(!digest[3].equalsIgnoreCase("x") && !digest[3].equalsIgnoreCase("y")) {
                                 message = "Wrong coordinate for expansion. It must have been either 'x' or 'y'\r\nTry another move";
                             user.sendMessage(message);
                             break;
@@ -228,6 +252,8 @@ public class ChatServer {
                         else if (user.numero == 2){
                             if(onlineGame.board.turn == 0)
                                 onlineGame.p2.enterFirstWord(digest[3], digest[4], digest[5], digest[6]);
+                            else
+                                onlineGame.p2.enterWord(digest[3], digest[4], digest[5], digest[6]);
                             if(!digest[3].equals("x") && !digest[3].equals("y")) {
                                 message = "Wrong coordinate for expansion. It must have been either 'x' or 'y'\r\nTry another move";
                                 user.sendMessage(message);
@@ -256,9 +282,9 @@ public class ChatServer {
                             else{
                                 message = onlineGame.gameBoard();
                                 broadcast(message, null);
-                                message = "Your tiles are : "+onlineGame.p2.getPlayerBag().toString()+"\r\nYour score is "+onlineGame.p2.score;
+                                message = "Your tiles are : "+onlineGame.p1.getPlayerBag().toString()+"\r\nYour score is "+onlineGame.p1.score;
                                 broadcast(message , user);
-                                message = "Your tiles are : "+onlineGame.p1.getPlayerBag().toString()+"\r\nYour score is "+onlineGame.p1.score;;
+                                message = "Your tiles are : "+onlineGame.p2.getPlayerBag().toString()+"\r\nYour score is "+onlineGame.p2.score;;
                                 user.sendMessage(message);
                                 for (int i = 0; i < userThreadsArray.size(); i++) {
                                     if (userThreadsArray.get(i) == user) {

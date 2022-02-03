@@ -10,7 +10,7 @@ public class UserThread extends Thread {
     public BufferedReader reader;
     public BufferedReader serverReader;
     public String  userName = null;
-    public boolean request = false;
+    public boolean request = false , over = false;
     public int turn, numero;
 
     public UserThread(Socket socket, ChatServer server) throws IOException {
@@ -51,7 +51,7 @@ public class UserThread extends Thread {
                         clientMessage = reader.readLine();
                         serverMessage = userName + "~" + clientMessage;
                         server.handle(serverMessage, this);
-                    } while (!clientMessage.equals("bye"));
+                    } while (!clientMessage.equals("OVER"));
 
             server.removeUser(userName, this);
             socket.close();
