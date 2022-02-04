@@ -184,6 +184,8 @@ public class Server {
                                 user.sendMessage("You don't have such tiles in your bag.\r\nMake another move");
                                 break;
                             } else {
+                                message = "Your tiles are now" + onlineGame.p1.getPlayerBag();
+                                user.sendMessage(message);
                                 for (int i = 0; i < userThreadsArray.size(); i++) {
                                     if (userThreadsArray.get(i) == user) {
                                         userThreadsArray.get(i).turn = 2;
