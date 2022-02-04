@@ -1,14 +1,17 @@
-package com.company.server;
+package com.company.client;
+
+import com.company.view.ReadThread;
+import com.company.controllers.WriteThread;
 
 import java.net.*;
 import java.io.*;
 
-public class ChatClient {
+public class Client {
     public String hostname;
     public int port;
     public String userName;
 
-    public ChatClient(String hostname, int port) {
+    public Client(String hostname, int port) {
         this.hostname = hostname;
         this.port = port;
     }
@@ -16,7 +19,7 @@ public class ChatClient {
     public void execute() {
         try {
             Socket socket = new Socket(hostname, port);
-            System.out.println("  ____        _   _   _           _     _       \n |  _ \\      | | | | | |         | |   (_)      \n | |_) | __ _| |_| |_| | ___  ___| |__  _ _ __  \n |  _ < / _` | __| __| |/ _ \\/ __| '_ \\| | '_ \\ \n | |_) | (_| | |_| |_| |  __/\\__ \\ | | | | |_) |\n |____/ \\__,_|\\__|\\__|_|\\___||___/_| |_|_| .__/ \n                                         | |    \n                                         |_|     ");
+            System.out.println("WELCOME TO SCRABBLE FOLLOW THE COMMANDS TO PLAY THE GAME IN THE LIST. ENJOY");
             System.out.println("Connected to the chat server");
 
             new ReadThread(socket, this).start();
@@ -30,7 +33,7 @@ public class ChatClient {
 
     }
 
-    void setUserName(String userName) {
+   public void setUserName(String userName) {
         this.userName = userName;
     }
 
@@ -41,7 +44,7 @@ public class ChatClient {
         String hostname = args[0];
         int port = Integer.parseInt(args[1]);
 
-        ChatClient client = new ChatClient(hostname, port);
+        Client client = new Client(hostname, port);
         client.execute();
     }
 }

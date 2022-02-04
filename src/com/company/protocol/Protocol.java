@@ -1,4 +1,4 @@
-package com.company;
+package com.company.protocol;
 
 public class Protocol {
     public static final char MESSAGE_SEPARATOR = '\u001e';

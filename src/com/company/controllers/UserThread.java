@@ -1,19 +1,20 @@
-package com.company.server;
+package com.company.controllers;
+
+import com.company.server.Server;
 
 import java.io.*;
 import java.net.*;
 
 public class UserThread extends Thread {
     private Socket socket;
-    private ChatServer server;
+    private Server server;
     public PrintWriter writer;
     public BufferedReader reader;
-    public BufferedReader serverReader;
     public String  userName = null;
-    public boolean request = false , over = false;
+    public boolean request = false;
     public int turn, numero;
 
-    public UserThread(Socket socket, ChatServer server) throws IOException {
+    public UserThread(Socket socket, Server server) throws IOException {
         this.socket = socket;
         this.server = server;
         InputStream input = socket.getInputStream();
@@ -22,7 +23,7 @@ public class UserThread extends Thread {
         writer = new PrintWriter(output, true);
     }
 
-    int userTurn(){
+    public int userTurn(){
         return this.turn;
     }
 
@@ -41,8 +42,11 @@ public class UserThread extends Thread {
             server.broadcast(serverMessage, this);
 
             server.addUserName(userName);
-            sendMessage("\n\nScrabble MENU\n ANNOUNCE-> Enter name\nSENDCHAT-> message the opponent(s)\n" +
-                    "REQUESTGAME->Request join a game.\nMAKEMOVE~WORD|SWAP|SKIP|OVER-> Make move either by entering word, Skipping turn, Swapping letters or Giving up\n\n");
+            sendMessage("\n\nScrabble MENU\nSENDCHAT-> message the opponent(s)\n" +
+                    "REQUESTGAME->Request join a game.\nMAKEMOVE~WORD|SWAP|SKIP-> Make move either by entering word, Skipping turn, Swapping letters\n" +
+                    "OVER to give up\nAn example command for placing a word would be 'MAKEMOVE~WORD~X~0~0~HEY'\n" +
+                    "This will print at the X axis at coordinate (0,0) the word 'HEY'\nPlayer who executes the first move" +
+                    "must have a tile in (7,7).\n\n");
 
             String clientMessage;
 
@@ -68,7 +72,7 @@ public class UserThread extends Thread {
     /**
      * Sends a list of online users to the newly connected user.
      */
-    void printUsers() {
+   public void printUsers() {
         if (server.hasUsers()) {
             writer.println("Connected users: " + server.getUserNames());
         } else {
@@ -79,7 +83,7 @@ public class UserThread extends Thread {
     /**
      * Sends a message to the client.
      */
-    void sendMessage(String message) {
+   public void sendMessage(String message) {
         writer.println(message);
     }
 }

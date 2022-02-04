@@ -1,4 +1,6 @@
-package com.company.server;
+package com.company.controllers;
+
+import com.company.client.Client;
 
 import java.io.*;
 import java.net.*;
@@ -7,9 +9,9 @@ import java.util.Scanner;
 public class WriteThread extends Thread {
     private PrintWriter writer;
     private Socket socket;
-    private ChatClient client;
+    private Client client;
 
-    public WriteThread(Socket socket, ChatClient client) {
+    public WriteThread(Socket socket, Client client) {
         this.socket = socket;
         this.client = client;
 

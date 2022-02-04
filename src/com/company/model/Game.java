@@ -1,15 +1,17 @@
-package com.company;
+package com.company.model;
 
-import javax.imageio.stream.ImageInputStream;
+import com.company.controllers.Player;
+import com.company.controllers.Tiles;
+import com.company.view.BoardTUI;
+
 import java.util.Scanner;
 
 public class Game {
     String name1,name2;
     public Player p1, p2;
     public Board board;
+    public BoardTUI viewBoard;
     public Tiles t;
-    int turn = 0;
-
     public Game(String name1, String name2) {
         this.name1 = name1;
         this.name2 = name2;
@@ -29,6 +31,7 @@ public class Game {
     public void setUpGame(String name1, String name2) {
         t = new Tiles();
         board = new Board();
+        viewBoard = new BoardTUI(board);
         board.setFieldsScore();
         Tiles t = new Tiles();
         t.setTiles();
@@ -49,14 +52,14 @@ public class Game {
         else return false;
     }
     public String gameBoard(){
-        return board.printBoard();
+        return viewBoard.printBoard();
     }
     public void gamePlay() {
         do {
             Scanner sc = new Scanner(System.in);
             System.out.println("Player " + p1.getPlayerName() + "'s turn ");
             String cmd;
-            board.printBoard();
+            viewBoard.printBoard();
             do {
                 System.out.println(p1.getPlayerBag());
                 p1.printOptions();
@@ -67,7 +70,7 @@ public class Game {
                 break;
             }
             System.out.println("Player " + p2.getPlayerName() + "'s turn");
-            board.printBoard();
+            viewBoard.printBoard();
             do {
                 System.out.println(p2.getPlayerBag());
                 System.out.println("Your score is: " + p2.getScore());
@@ -115,9 +118,6 @@ public class Game {
         return " "+announceWinner();
     }
 
-
-    public static void main(String[] args) {
-    }
 
 
 }

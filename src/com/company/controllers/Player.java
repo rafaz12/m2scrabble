@@ -1,62 +1,88 @@
-package com.company;
+package com.company.controllers;
+
+import com.company.model.Board;
+import com.company.view.BoardTUI;
 
 import java.util.*;
 
 import static java.lang.Integer.parseInt;
-
+/*
+    @invariant all parameters of all methods may not be null.
+ */
 
 public class Player {
     public IllegalArguments ill = new IllegalArguments();
     public Integer dred = new Integer(3) , pred = new Integer(2), start = new Integer(2) , dblue = new Integer(3), pblue= new Integer(2);
-    public Integer[][] fieldPoints;
-    public HashMap<Character,Integer> tileValue = new HashMap<>();
     public Tiles tiles = new Tiles();
     public int wordScore = 0;
     public boolean letterExist, validPlacement;
     public boolean tilesExist;
     public boolean giveUp = false ;
     public String h = "", v ="";
-    public int turn;
     public Dictionary dic = new Dictionary();
-    public int c = 0;
     public ArrayList<Integer> row = new ArrayList<>();
     ArrayList<Integer> col = new ArrayList<>();
     Board b = new Board();
-    public int score = 0, m = 0, k = 0;
+    BoardTUI viewBoard ;
+    public int score = 0, k = 0;
     Tiles t = new Tiles();
 
-    ArrayList<Map.Entry<Character, Integer>> playerBag  = new ArrayList<>();
+   public ArrayList<Map.Entry<Character, Integer>> playerBag  = new ArrayList<>();
     String name, word = " ", coord = "";
-
+/*
+@required player name and game board as Strings
+    sets the board, name of the player, and sets the view of the board.
+ */
     public Player(String name, Board b) {
         this.b  = b;
+        this.viewBoard = new BoardTUI(b);
         this.name = name;
-        t.setTiles();
     }
-
-    void playerSetScore(){
-        this.score = getScore();
-    }
-    int getPlayerScore(){
+/*
+    returns player score.
+ */
+    public int getPlayerScore(){
         return this.score;
     }
-    void setPlayerBag(ArrayList<Map.Entry<Character,Integer>> genBag) {
+
+    /*
+          @required general bag
+          sets player tile bag
+     */
+    public  void setPlayerBag(ArrayList<Map.Entry<Character,Integer>> genBag) {
         for (int i = 0; i < 7; i++) {
             this.playerBag.add(genBag.get(i));
            genBag.remove(genBag.get(i));
         }
     }
+    /*
+        returns player bag
+     */
     ArrayList<Map.Entry<Character, Integer>> playerBag(){
         return this.playerBag;
     }
-    boolean checkPlayerCommand( String text){
+
+    /*
+    requires text to be string and not null.
+    returns true if the command user put if not valid.
+     */
+    public boolean checkPlayerCommand( String text){
         if (!text.equals("M") && !text.equals("SK") && !text.equals("SW") && !text.equals("G"))
             return false;
         return true;
     }
-    String getPlayerName(){
+    /*
+        returns player name.
+     */
+   public String getPlayerName(){
         return this.name;
     }
+    /*
+
+       @requires command to not be null , coordinate of expansion as string , coordinate x as string , coordinate y
+       as string , word as string.
+       executes desired command
+     */
     public void makeMove(String cmd, String letters, String coord, String h , String v , String word){
         this.coord = coord;
         this.h = h;
@@ -78,8 +104,6 @@ public class Player {
         }
         else if(cmd.equals("SW")){
             ArrayList<Map.Entry<Character, Integer>> lettersArray;
-
-                //letters = sc.next().toUpperCase();
                 tilesExist = t.validSwap(letters.length(),t.generalTiles);
                 lettersArray = getLettersArray(letters);
                 letterExist = checkBagLetters(letters, lettersArray, this.playerBag);
@@ -100,7 +124,9 @@ public class Player {
         }
          }
 
-
+    /*
+        returns playerbag
+     */
    public ArrayList<Map.Entry<Character, Integer>> getPlayerBag() {
         if (this.playerBag.contains(Map.entry('!', 0))) {
             int temp = playerBag.indexOf(Map.entry('!', 0));
@@ -109,44 +135,29 @@ public class Player {
         }
         return this.playerBag;
     }
-    void printPlayersBoard(){
-        b.printBoard();
-    }
-
-    void remainingLetters(ArrayList<Map.Entry<Character, Integer>> bag) {
-        System.out.println(bag);
-    }
-
-    String getWordDirection() {
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Please select coordinate x or y for word expansion ");
-        coord = sc.next();
-        while (!coord.equals("x") && !coord.equals("y")) {
-
-            System.out.println("Please select coordinate x or y for word expansion ");
-            coord = sc.next();
-        }
-        return coord;
-    }
+    /*
+        returns a hashmap of values of tiles where Character is a letter and value is the
+        corresponding value of the Tile.
+     */
     HashMap<Character,Integer> getValues() {
         Tiles tile = new Tiles();
         return tile.getTilesValues();
     }
-
-    String getWord() {
-        String word;
-        System.out.println("Please enter a word. ");
-        Scanner sc = new Scanner(System.in);
-        word = sc.next().toUpperCase();
-
-        return word;
-    }
+    /*
+        requires a word and reverses it.
+        returns the reversed word.
+     */
     String reverseWord(String word){
         StringBuilder reverseWord = new StringBuilder();
         reverseWord.append(word);
         reverseWord.reverse();
         return reverseWord.toString();
     }
+    /*
+    requires x,y coordinates, word and board.
+    checks all the words that can be formed by inserting a word horizontally.
+    returns true whether all words formed are valid and the word can be placed at the desired coordinate.
+     */
     boolean checkListWordsHorizontal(int i, int j , String word, String[][] board){
         boolean validWord = false;
         ArrayList<String> words = new ArrayList<>();
@@ -169,13 +180,23 @@ public class Player {
 
         return validWord;
     }
+    /*
+    requires x,y coordinates, word, board and coordinate of expansion.
+    checks all the words that can be formed by inserting a word.
+    makes use of checkListHorizontal and checkLisrVertically according to the inut of coordinate of expansion
+    returns true whether all words formed are valid and the word can be placed at the desired coordinate.
+     */
     boolean checkListWords(String coord,int i, int j , String word, String[][] board){
         if(coord.equals("x"))
             return checkListWordsHorizontal( i, j ,word, board);
         else
             return checkListWordsVertical( i, j ,word, board);
     }
-
+    /*
+    requires x,y coordinates, word and board.
+    checks all the words that can be formed by inserting a word vertically.
+    returns true whether all words formed are valid and the word can be placed at the desired coordinate.
+     */
     boolean checkListWordsVertical(int i, int j , String word, String[][] board){
         boolean validWord = false;
         ArrayList<String> words = new ArrayList<>();
@@ -195,7 +216,11 @@ public class Player {
         return validWord;
     }
 
+    /*
 
+    requires x,y coordinates, word and board.
+    returns a string representation of the word on the right of the word.
+     */
     String getRightWord(int i, int j ,String word, String[][] board){
         boolean empty = false;
         String rightWord ="";
@@ -210,6 +235,11 @@ public class Player {
         }
         return rightWord;
     }
+    /*
+
+    requires x,y coordinates and board.
+    returns a string representation of the word on the left of the word.
+     */
     String getLeftWord(int i, int j ,String[][] board){
         boolean empty = false;
         String leftWord ="";
@@ -224,7 +254,10 @@ public class Player {
         }
         return reverseWord(leftWord);
     }
-
+    /*
+    requires x,y coordinates and board.
+    returns a string representation of the word on the above the word.
+ */
     String getAboveWord(int i, int j ,String[][] board){
         boolean empty = false;
         String aboveWord ="";
@@ -239,6 +272,10 @@ public class Player {
         }
         return reverseWord(aboveWord);
     }
+        /*
+    requires x,y coordinates, word and board.
+    returns a string representation of the word below the word.
+     */
     String getBelowWord(int i, int j,String word ,String[][] board){
         boolean empty = false;
         String belowWord ="";
@@ -253,9 +290,11 @@ public class Player {
         }
         return belowWord;
     }
-
-    void
-    updateBagTiles(ArrayList<Map.Entry<Character, Integer>> playerBag , String word, int i , int j , String[][] board) {
+    /*
+    requires list of the tiles of the player, word, coordinates and board.
+    updates the player's bag.
+     */
+    void updateBagTiles(ArrayList<Map.Entry<Character, Integer>> playerBag , String word, int i , int j , String[][] board) {
         for (int x = 0; x < word.length(); x++){
             for (int m = 0; m < playerBag.size(); m++) {
                 if (this.playerBag.get(m).getKey().equals(word.charAt(x)) || ill.checkEmpty(i,j,b.getBoardData())) {
@@ -274,7 +313,10 @@ public class Player {
             }
         }
     }
-
+    /*
+        requires coorfinates , word and board
+        sets the score of thr word placed horizontaly
+     */
     void setHorizontalScore(int x, int y, String word, String[][] board){
         Integer arr[][] = b.getFieldPoints();
         if((getLeftWord(x, y, board).length() != 0 || getRightWord(x, y,word, board).length() != 0) &&
@@ -287,6 +329,10 @@ public class Player {
             System.out.println(score);
         }
     }
+
+   /* requires coorfinates , word and board
+    sets the score of thr word placed horizontaly
+            */
     void setVerticalScore(int x, int y, String word, String[][] board)  {
         Integer arr[][] = b.getFieldPoints();
         if ((getAboveWord(x, y, board).length() != 0 || getBelowWord(x, y, word, board).length() != 0)
@@ -298,7 +344,10 @@ public class Player {
             System.out.println(arr[x][y]);
         }
     }
-
+    /*
+    requires coordinates, coordinate of expansion, word , boardData and board object
+    sets the overall score of the player.
+     */
     public void setScore(int x, int y,String coord, String word, String[][] board, Board b ) {
         row = getXCoordSpecialVal();
         col = getYCoordSpecialVal();
@@ -329,18 +378,28 @@ public class Player {
         b.setNewFieldsScore(arr);
     }
 
-
+    /*
+    returns a list of x coordinates representing specialvalues
+     */
     ArrayList<Integer> getXCoordSpecialVal(){
         return row;
     }
 
+    /*
+    returns list of y coordinates representing special values.
+     */
     ArrayList<Integer> getYCoordSpecialVal(){
         return col;
     }
+
+
+    /*
+    requires coordinates, coordinate of expansion, word and board object
+    sets the overall score for a word being inputed by the player.
+     */
+
     public  void setWordScore(int x, int y, String coord , String word, Board b) {
         Integer[][] arr = b.getFieldPoints();
-
-
         int dredCount = 0;
         int predCount = 0;
         wordScore = 0;
@@ -426,15 +485,21 @@ public class Player {
 
     }
 
-
-    int getScore() {
+    /*
+        returns score.
+     */
+    public int getScore() {
         return this.score;
     }
 
 
 
 
-
+    /*
+        requires coordinate of expansion, x,y coordinates as strings and word.
+        sets the first word on the board with the respective points going to the user
+        if word is valid.
+     */
     public void enterFirstWord(String coord , String k , String l, String word) {
         validPlacement = false;
         int x, y, w, e, c;
@@ -480,7 +545,11 @@ public class Player {
     }
 
 
-
+    /*
+        receives a string of letetrs that the player wants to exchange.
+        swaps letters if letters exist in the bag and there are enough letters in the
+        general bag.
+     */
     void swapLetters(String letters ) {
         for (int i = 0; i < letters.length(); i++)
             for (int j = 0; j < this.getPlayerBag().size(); j++)
@@ -493,11 +562,19 @@ public class Player {
                     break;
                 }
     }
+    /*
+        requires playerBag.
+        returns true if there exists blank '!', tile.
+     */
     boolean checkBlankTile(ArrayList<Map.Entry<Character, Integer>> playerBag){
         if(this.playerBag.contains('!'))
             return true;
         return false;
     }
+    /*
+        requires player bag.
+        returns the number of blank tiles in the bag.
+     */
     int getBlankTiles(ArrayList<Map.Entry<Character, Integer>> playerBag){
         int c = 0;
         for( int i = 0; i< this.playerBag.size(); i++){
@@ -506,7 +583,12 @@ public class Player {
         }
         return c;
     }
-
+    /*
+    @requires string of letter the user wishes to swap, a list of Map entries of Characters and integers
+    that represents the character and value of each letter the player wishes to swap
+    and the player bag of the user.
+    returns true if the letters exist in the bag.
+     */
     boolean checkBagLetters(String letters, ArrayList<Map.Entry<Character, Integer>> lettersArray, ArrayList<Map.Entry<Character, Integer>> playerBag ) {
         int counter = 0;
         boolean letterExist = false;
@@ -523,6 +605,11 @@ public class Player {
             letterExist = true;
         return letterExist;
     }
+    /*
+        @requires  string of letters the user wishes to exchange.
+        returns a list of characters and values of the charactes of the letters
+        that the player wishes to swap.
+     */
 
     ArrayList<Map.Entry<Character, Integer>> getLettersArray(String letters) {
         ArrayList<Map.Entry<Character, Integer>> lettersArray = new ArrayList<>();
@@ -532,12 +619,11 @@ public class Player {
         }
         return lettersArray;
     }
-    boolean giveUp( String cmd) {
-        boolean giveUp = false;
-        if(cmd.equals("G"))
-            giveUp = true;
-        return giveUp;
-    }
+    /*
+       @requires player bag. checks if the bag of the player is empty after
+       placing a word and getting new tiles. if this is the case then
+       true is returned representing that the game is over.
+     */
     boolean checkGameOver( ArrayList<Map.Entry<Character, Integer>> playerBag){
         if(playerBag.size() == 0){
             System.out.println("Game over");
@@ -545,43 +631,24 @@ public class Player {
         return true;
     }
 
-
+    /*
+        prints message that the turn is skipped.
+     */
     void skipTurn() {
         System.out.println("Turn skipped. ");
     }
-
-    boolean validateCoordinate(String k, String l) {
-        boolean trueCoord = false;
-        int x = 0, y = 0;
-        if (ill.isInteger(k) && ill.isInteger(l)) {
-            x = parseInt(k);
-            y = parseInt(l);
-
-        } else return false;
-        if (ill.validCoordinate(x, y))
-            trueCoord = true;
-        return trueCoord;
-    }
+        /*
+        requires coordinate of expansion, x,y coordinates as strings and word.
+        sets the word on the board with the respective points going to the user
+        if word is valid.
+     */
 
     public void enterWord(String coord, String k, String l, String word) {
         validPlacement = false;
         int x, y;
 
-
         x = parseInt(k);
         y = parseInt(l);
-      /*  if (coord.equals("x"))
-            do {
-                word = getWord().toUpperCase();
-                if (!ill.validCoordinate(x, word.length() - 1 + y))
-                    System.out.println("Enter another word inside bounds");
-            } while (!ill.validCoordinate(x, word.length() - 1 + y));
-        else do {
-            word = getWord().toUpperCase();
-            if (!ill.validCoordinate(x + word.length() - 1, y))
-                System.out.println("Enter another word inside bounds");
-        } while (!ill.validCoordinate(x + word.length() - 1, y));
-       */
         if (notAllConditionsMet(x, y , word , coord )) {
             System.out.println("Invalid move");
         } else {
@@ -595,6 +662,12 @@ public class Player {
             updateBagTiles(this.playerBag, word, x, y, b.getBoardData());
         }
     }
+
+        /*
+        requires coordinate of expansion, x,y coordinates as strings and word.
+        checks if all the conditions are  met for placing a word.
+        if not it returns true.
+     */
     public boolean notAllConditionsMet(int x, int y , String word , String coord ){
         if(!dic.contains(word) ||  !ill.validWordPlacement(x, y, this.coord, word, b.getBoardData()) || !checkListWords(coord, x, y, word, b.getBoardData())  ||
                 !checkBagLetters(word, getLettersArray(word),playerBag) ||
@@ -603,8 +676,10 @@ public class Player {
         return false;
     }
 
-
-    void printOptions(){
+    /*
+        prints options of the player.
+     */
+    public void printOptions(){
         System.out.println(
                 "Type 'M' to make move" +
                 "Type 'SK' to skip turn"+
@@ -613,8 +688,4 @@ public class Player {
         );
     }
 
-    public static void main(String[] args) {
-
-
-    }
 }

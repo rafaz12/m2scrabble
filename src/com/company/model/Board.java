@@ -1,32 +1,29 @@
-package com.company;
+package com.company.model;
 
+
+import com.company.controllers.IllegalArguments;
+import com.company.controllers.Tiles;
+import com.company.controllers.Dictionary;
+import com.company.view.BoardTUI;
 
 import java.util.*;
 
 import static java.lang.Integer.parseInt;
 
-/**
- * Board for the Tic Tac Toe game. Module 2 lab assignment.
- *
- * @author Theo Ruys en Arend Rensink
- * @version $Revision: 1.4 $
- */
+
 public class Board {
     public static final int DIM = 15;
     public IllegalArguments ill = new IllegalArguments();
     public Integer dred = new Integer(3) , pred = new Integer(2), start = new Integer(2) , dblue = new Integer(3), pblue= new Integer(2);
     public Integer[][] fieldPoints;
-    public Coordinates coordinates = new Coordinates();
     public Tiles tiles ;
-    public Dictionary dic = new Dictionary();
+    public com.company.controllers.Dictionary dic = new Dictionary();
     public int c = 0;
     public ArrayList<String> wordsWritten = new ArrayList<>();
     public ArrayList<Integer> row = new ArrayList<>();
     ArrayList<Integer> col = new ArrayList<>();
     public int score = 0, m = 0, k = 0, turn =0;
     public String[][] board = new String[DIM][DIM];
-    public String symbol, coord = "";
-    public Scanner sc;
     public ArrayList<String> newWordsFormed = new ArrayList<>();
     // -- Constructors -----------------------------------------------
 
@@ -45,65 +42,45 @@ public class Board {
         setFieldsScore();
     }
 
-    int getTileNumbers() {
-        return tiles.getTiles().size();
-    }
-
+    /**
+     *
+     * @returns a 2x array that includes the data of the board.
+     */
     public String [][] getBoardData(){
         return board;
     }
 
-    void setYCoordinate(int x, int y, String word) {
+    /*
+        @requires y and x coordinate and a word.
+        sets the word horiontally on the board.
+     */
+    public void setYCoordinate(int x, int y, String word) {
         for (k = 0; k < word.length(); k++) {
            board[x][y + k] = String.valueOf(word.charAt(k));
         }
 
     }
 
-    void setXCoordinate(int x, int y , String word) {
+    /*
+        @requires y and x coordinate and a word.
+        sets the word vertically on the board.
+     */
+    public void setXCoordinate(int x, int y , String word) {
         for (k = 0; k < word.length(); k++) {
             board[x + k][y] = String.valueOf(word.charAt(k));
         }
     }
-    ArrayList<String> newWordsFormed(){
-        return newWordsFormed;
-    }
-    void updateBoard(){
-        printBoard();
-    }
-
-
-
-
-    void setNewBoard() {
-        for (int i = 0; i < DIM; i++)
-            for (int j = 0; j < DIM; j++) {
-                if (j == 0)
-                    this.symbol = symbol + "\r\n";
-                this.symbol = symbol + "   " + board[i][j];
-            }
-    }
-
-    String printBoard() {
-        String printBoard = "";
-        for (int i = 0; i < DIM; i++) {
-            for (int j = 0; j < DIM; j++) {
-                printBoard = printBoard + board[i][j] + "   ";
-                if (j == DIM - 1) {
-                    printBoard = printBoard + "\r\n";
-                }
-            }
-        }
-        return printBoard;
-    }
-
-    void getNewBoard() {
-        System.out.println(this.symbol);
-    }
-    void setNewFieldsScore(Integer[][] arr){
+    /*
+        @requires an array of Integer objects
+        sets the fieldpoints as the arrar.
+     */
+    public void setNewFieldsScore(Integer[][] arr){
         this.fieldPoints = arr;
     }
-    void setFieldsScore() {
+    /*
+        sets the score of the fields for the board.
+     */
+    public void setFieldsScore() {
         for (int i = 0; i < DIM; i++)
             for (int j = 0; j < DIM; j++)
                 fieldPoints[i][j] = 1;
@@ -162,13 +139,11 @@ public class Board {
         fieldPoints[3][14] = pblue;
         fieldPoints[11][14] = pblue;
     }
-
-    Integer[][] getFieldPoints() {
+    /*
+        @returns a 2x Integer array that has all the values of the fields.
+     */
+    public Integer[][] getFieldPoints() {
         return this.fieldPoints;
     }
 
-
-    public static void main(String[] args) {
-        Board b = new Board();
-    }
 }

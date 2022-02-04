@@ -1,4 +1,6 @@
-package com.company.server;
+package com.company.view;
+
+import com.company.client.Client;
 
 import java.io.*;
 import java.net.*;
@@ -6,9 +8,9 @@ import java.net.*;
 public class ReadThread extends Thread {
     private BufferedReader reader;
     private Socket socket;
-    private ChatClient client;
+    private Client client;
 
-    public ReadThread(Socket socket, ChatClient client) {
+    public ReadThread(Socket socket, Client client) {
         this.socket = socket;
         this.client = client;
 
@@ -24,8 +26,9 @@ public class ReadThread extends Thread {
     public void run() {
         while (true) {
             try {
-                String response = reader.readLine();
-                if (response.equals("999")) {
+                String response = "";
+                response = reader.readLine();
+                if (response.equals("OVER")) {
                     System.exit(0);
                 }
                 System.out.println(response);
