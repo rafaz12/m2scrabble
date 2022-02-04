@@ -277,7 +277,7 @@ public class Server {
                                 }
                             }
                             else{
-                                message = onlineGame.gameBoard();
+                                message = onlineGame.viewBoard.printBoard();
                                 broadcast(message, null);
                                 message = "Your tiles are : "+onlineGame.p2.getPlayerBag().toString()+"\r\nYour score is "+onlineGame.p2.score;
                                 broadcast(message , user);
@@ -342,7 +342,7 @@ public class Server {
                                 }
                             }
                             else{
-                                message = onlineGame.gameBoard();
+                                message = onlineGame.viewBoard.printBoard();
                                 broadcast(message, null);
                                 message = "Your tiles are : "+onlineGame.p1.getPlayerBag().toString()+"\r\nYour score is "+onlineGame.p1.score;
                                 broadcast(message , user);

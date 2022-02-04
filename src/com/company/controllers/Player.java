@@ -34,6 +34,7 @@ public class Player {
     sets the board, name of the player, and sets the view of the board.
  */
     public Player(String name, Board b) {
+        this.t.setTiles();
         this.b  = b;
         this.viewBoard = new BoardTUI(b);
         this.name = name;
@@ -147,7 +148,7 @@ public class Player {
         requires a word and reverses it.
         returns the reversed word.
      */
-    String reverseWord(String word){
+    public String reverseWord(String word){
         StringBuilder reverseWord = new StringBuilder();
         reverseWord.append(word);
         reverseWord.reverse();
@@ -550,7 +551,7 @@ public class Player {
         swaps letters if letters exist in the bag and there are enough letters in the
         general bag.
      */
-    void swapLetters(String letters ) {
+    public void swapLetters(String letters ) {
         for (int i = 0; i < letters.length(); i++)
             for (int j = 0; j < this.getPlayerBag().size(); j++)
                 if (this.getPlayerBag().get(j).getKey().equals(letters.charAt(i))) {
@@ -566,7 +567,7 @@ public class Player {
         requires playerBag.
         returns true if there exists blank '!', tile.
      */
-    boolean checkBlankTile(ArrayList<Map.Entry<Character, Integer>> playerBag){
+    public boolean checkBlankTile(ArrayList<Map.Entry<Character, Integer>> playerBag){
         if(this.playerBag.contains('!'))
             return true;
         return false;
@@ -589,7 +590,7 @@ public class Player {
     and the player bag of the user.
     returns true if the letters exist in the bag.
      */
-    boolean checkBagLetters(String letters, ArrayList<Map.Entry<Character, Integer>> lettersArray, ArrayList<Map.Entry<Character, Integer>> playerBag ) {
+   public boolean checkBagLetters(String letters, ArrayList<Map.Entry<Character, Integer>> lettersArray, ArrayList<Map.Entry<Character, Integer>> playerBag ) {
         int counter = 0;
         boolean letterExist = false;
         for (int i = 0; i < letters.length(); i++) {
@@ -611,7 +612,7 @@ public class Player {
         that the player wishes to swap.
      */
 
-    ArrayList<Map.Entry<Character, Integer>> getLettersArray(String letters) {
+   public ArrayList<Map.Entry<Character, Integer>> getLettersArray(String letters) {
         ArrayList<Map.Entry<Character, Integer>> lettersArray = new ArrayList<>();
         for (int i = 0; i < letters.length(); i++) {
             char key = letters.charAt(i);

@@ -107,7 +107,7 @@ public class IllegalArguments {
             /*@requires cooridinates x,y, board.
         returns true if field is the same letter as the character.
         */
-          boolean checkSameLetter(int i , int j , String ch , String [][] board ) {
+            public boolean checkSameLetter(int i, int j, String ch, String[][] board) {
               boolean sameLetter;
                       if (board[i][j].equals(ch))
                           sameLetter = true;
